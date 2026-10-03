@@ -1,4 +1,6 @@
-# Atalaia
+# Argos
+
+<sub>O nome vem de Argos Panoptes. [Por quê?](MITO.md) O pacote Python ainda se chama `atalaia`, nome anterior do projeto.</sub>
 
 **Vigilância determinística de fontes abertas, com léxico como dado e descarte auditável.**
 
@@ -13,7 +15,7 @@ garante que nada publicado sobre um assunto passe em silêncio, e que ninguém p
 trezentas páginas por semana para descobrir isso.
 
 > Nasceu do [Sentinela](https://github.com/luccas-amorim/atlaspen/blob/main/docs/os-robos.md)
-> do AtlasPen, que vigia a Seção 1 do Diário Oficial em busca de lei penal nova. O Atalaia
+> do AtlasPen, que vigia a Seção 1 do Diário Oficial em busca de lei penal nova. O Argos
 > é a generalização: a mesma disciplina (texto integral, triagem em níveis, falso
 > positivo aceitável, falso negativo não), separada do direito penal para servir a
 > qualquer domínio que caiba num léxico.
@@ -128,7 +130,7 @@ rede. Fonte que muda de forma quebra o teste, não a rodada em silêncio.
 ```
 
 O léxico tem dono fora deste repositório. O do AtlasPen é gerado a partir de
-`crimes.json`; o do Carandiru é mantido pela pesquisa que o catalogou. O Atalaia valida
+`crimes.json`; o do Carandiru é mantido pela pesquisa que o catalogou. O Argos valida
 o formato e aplica. Mudar um termo é um commit em dado, não em código.
 
 ### A triagem em níveis
@@ -148,10 +150,10 @@ texto integral da rodada fica guardado.
 
 ## Como o AtlasPen usa
 
-O Atalaia é **dependência** do AtlasPen, fixada por tag. O AtlasPen não copia código daqui.
+O Argos é **dependência** do AtlasPen, fixada por tag. O AtlasPen não copia código daqui.
 
 ```
-atalaia/  (este repositório)              atlaspen/  (consumidor)
+argos/   (este repositório)              atlaspen/  (consumidor)
   fontes/datajud.py                         scripts/robos/jurisprudencia/
   fontes/stf.py                               lexico.py      ← gera o léxico a partir de crimes.json
   fontes/stj.py                               mapear.py      ← traduz a saída JSONL para data/jurisprudencia.json
@@ -160,7 +162,7 @@ atalaia/  (este repositório)              atlaspen/  (consumidor)
 
 O que é geral (falar com tribunal, baixar inteiro teor, triar) mora aqui. O que é do
 AtlasPen (quais termos, como uma decisão vira linha de `data/jurisprudencia.json`, qual
-registro recebe o quê) mora lá. A fronteira é o JSONL: o Atalaia entrega documentos
+registro recebe o quê) mora lá. A fronteira é o JSONL: o Argos entrega documentos
 aceitos com proveniência e as chaves do léxico que casaram; o AtlasPen decide o que fazer
 com isso, com a mesma regra dos outros robôs: o que não é inequívoco vira pergunta na
 issue, não dado.
