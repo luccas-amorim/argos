@@ -1,6 +1,6 @@
 # Argos
 
-<sub>O nome vem de Argos Panoptes. [Por quê?](MITO.md) O pacote Python ainda se chama `atalaia`, nome anterior do projeto.</sub>
+<sub>O nome vem de Argos Panoptes. [Por quê?](MITO.md)</sub>
 
 **Vigilância determinística de fontes abertas, com léxico como dado e descarte auditável.**
 
@@ -71,11 +71,11 @@ Cinco peças, cada uma com um contrato pequeno e um diretório:
 
 | Diretório | Peça | O que garante |
 |---|---|---|
-| `atalaia/fontes/` | **Adaptadores** | um por origem; mesmo contrato para todos (abaixo) |
-| `atalaia/captura.py` | **Captura** | texto integral normalizado em UTF-8, hash, data; respeita limite da fonte; grava `.part` e só promove quando a sentinela de integridade passa |
-| `atalaia/lexico.py` | **Léxico** | carrega e valida o vocabulário contra `exemplos/lexico.schema.json`; expande variantes; nunca contém termo em código |
-| `atalaia/triagem.py` | **Triagem** | níveis, motivo de descarte, trecho que decidiu |
-| `atalaia/saidas/` | **Saídas** | JSONL (canônico), CSV, issue no GitHub, export arquivístico |
+| `argos/fontes/` | **Adaptadores** | um por origem; mesmo contrato para todos (abaixo) |
+| `argos/captura.py` | **Captura** | texto integral normalizado em UTF-8, hash, data; respeita limite da fonte; grava `.part` e só promove quando a sentinela de integridade passa |
+| `argos/lexico.py` | **Léxico** | carrega e valida o vocabulário contra `exemplos/lexico.schema.json`; expande variantes; nunca contém termo em código |
+| `argos/triagem.py` | **Triagem** | níveis, motivo de descarte, trecho que decidiu |
+| `argos/saidas/` | **Saídas** | JSONL (canônico), CSV, issue no GitHub, export arquivístico |
 
 O estado é um arquivo (`estado/<fonte>.json`) com os hashes já vistos e a data da última
 rodada por fonte. Apagar o estado equivale a reler tudo. Nada mais é guardado entre
@@ -84,7 +84,7 @@ rodadas.
 ### O contrato do adaptador
 
 Um adaptador é um módulo com três funções e um bloco de metadados. Está em
-[`atalaia/contrato.py`](atalaia/contrato.py) como `Protocol`, com docstring por função.
+[`argos/contrato.py`](argos/contrato.py) como `Protocol`, com docstring por função.
 
 ```python
 class Fonte(Protocol):
@@ -153,7 +153,7 @@ texto integral da rodada fica guardado.
 O Argos é **dependência** do AtlasPen, fixada por tag. O AtlasPen não copia código daqui.
 
 ```
-argos/   (este repositório)              atlaspen/  (consumidor)
+argos/  (este repositório)              atlaspen/  (consumidor)
   fontes/datajud.py                         scripts/robos/jurisprudencia/
   fontes/stf.py                               lexico.py      ← gera o léxico a partir de crimes.json
   fontes/stj.py                               mapear.py      ← traduz a saída JSONL para data/jurisprudencia.json
@@ -207,9 +207,9 @@ corpus possa entrar no grafo sem retrabalho.
 ## Rodar
 
 ```bash
-python -m atalaia rodar --config exemplos/atlaspen/config.json       # uma rodada
-python -m atalaia rodar --config ... --desde 2026-09-01 --sem-estado  # reler tudo
-python -m atalaia validar-lexico exemplos/lexico.exemplo.json
+python -m argos rodar --config exemplos/atlaspen/config.json       # uma rodada
+python -m argos rodar --config ... --desde 2026-09-01 --sem-estado  # reler tudo
+python -m argos validar-lexico exemplos/lexico.exemplo.json
 python -m pytest                                                      # sem rede, contra fixtures
 ```
 
