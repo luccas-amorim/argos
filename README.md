@@ -26,7 +26,7 @@ trezentas páginas por semana para descobrir isso.
 
 | Caso | Fontes | Léxico | Saída |
 |---|---|---|---|
-| **Jurisprudência do AtlasPen** | DataJud (CNJ), STF, STJ | os tipos penais de `crimes.json`: nomes, artigos, rótulos de lei | decisões ligadas a cada tipo, para `data/jurisprudencia.json` |
+| **Jurisprudência do AtlasPen** | DataJud (CNJ), STF, STJ | os tipos penais de `crimes.json`: nomes, artigos, rótulos de lei | decisões ligadas a cada tipo, em relatório (o formato de dado é decisão do AtlasPen) |
 | **Observatório do Massacre do Carandiru** | imprensa (RSS), repositórios acadêmicos, Wayback Machine | o universo léxico já catalogado pela pesquisa | corpus com proveniência, exportável para descrição arquivística |
 
 Dois domínios sem nada em comum além da forma. É de propósito: se o motor serve aos dois
@@ -171,7 +171,7 @@ O Argos é **dependência** do AtlasPen, fixada por tag. O AtlasPen não copia c
 argos/  (este repositório)              atlaspen/  (consumidor)
   fontes/datajud.py                         scripts/robos/jurisprudencia/
   fontes/stf.py                               lexico.py      ← gera o léxico a partir de crimes.json
-  fontes/stj.py                               mapear.py      ← traduz a saída JSONL para data/jurisprudencia.json
+  fontes/stj.py                               mapear.py      ← leva a saída JSONL aos registros, como relatório
   triagem.py, captura.py, saidas/jsonl.py     workflow       ← roda toda segunda, depois do Vigia
 ```
 
@@ -211,8 +211,8 @@ corpus possa entrar no grafo sem retrabalho.
 ## Roadmap
 
 Os dois usos têm plano próprio, com fontes, recorte e ordem de trabalho:
-[jurisprudência para o AtlasPen](docs/jurisprudencia.md) (com o [plano do STF](docs/stf.md)
-à parte) e [observatório do Carandiru](https://github.com/luccas-amorim/observatory), que
+[jurisprudência para o AtlasPen](https://github.com/luccas-amorim/atlaspen/blob/main/.superpowers/specs/2026-10-04-jurisprudencia.md)
+(o que se mediu das fontes judiciais está em [docs/jurisprudencia.md](docs/jurisprudencia.md)) e [observatório do Carandiru](https://github.com/luccas-amorim/observatory), que
 vive no próprio repositório.
 
 - **v0.1** (feita; primeira rodada real contra o DataJud do STM em 04/10/2026) motor: contrato, captura com `.part` e sentinela, léxico com schema e
