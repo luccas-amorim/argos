@@ -210,7 +210,8 @@ corpus possa entrar no grafo sem retrabalho.
 
 Os dois usos têm plano próprio, com fontes, recorte e ordem de trabalho:
 [jurisprudência para o AtlasPen](docs/jurisprudencia.md) (com o [plano do STF](docs/stf.md)
-à parte) e [observatório do Carandiru](docs/carandiru.md).
+à parte) e [observatório do Carandiru](https://github.com/luccas-amorim/observatory), que
+vive no próprio repositório.
 
 - **v0.1** (feita; primeira rodada real contra o DataJud do STM em 04/10/2026) motor: contrato, captura com `.part` e sentinela, léxico com schema e
   validação, triagem em níveis, estado, saída JSONL, relatório em dois tamanhos.
@@ -219,8 +220,9 @@ Os dois usos têm plano próprio, com fontes, recorte e ordem de trabalho:
   `lista` e as fontes do STF, `stj` com fixtures; exemplo de consumidor em
   `exemplos/atlaspen/`. Primeira rodada real contra o léxico gerado de `crimes.json`.
   Catálogo CSV cumulativo e modo sem texto (**feitos**), pedidos pelo observatório.
-- **v0.3** observatório: `wayback`, `google-noticias`, `scielo`; saída arquivística;
-  exemplo de consumidor em `exemplos/observatorio/` com léxico de amostra.
+- **v0.3** observatório: `wayback`, `openalex`, `gdelt` e `argos estimar` (**feitos**);
+  segundo canal acadêmico (Crossref ou OAI-PMH), Common Crawl pelo texto, saída
+  arquivística. O consumidor é o repositório `observatory`.
 - **depois** saída issue no GitHub, nível opt-in com modelo (marcado), migração do `dou`.
 
 ## Rodar

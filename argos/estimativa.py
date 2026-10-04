@@ -7,6 +7,17 @@ mais, o estimador de Chao, que usa quantas páginas foram vistas por um canal s�
 por exatamente dois (`f2`) e é um **piso** robusto à heterogeneidade (página popular é
 mais fácil de achar que página obscura).
 
+Duas regras de uso que o código impõe:
+
+- **Canal é o prefixo do id da fonte** (`wayback:folha` e `wayback:estadao` são o mesmo
+  canal, `wayback`). Domínios do Wayback não se sobrepõem; tratados como canais
+  separados, quase toda URL seria "vista por um canal só" e a estimativa explodiria.
+- **Só se comparam canais do mesmo estrato.** Captura e recaptura supõe que os canais
+  olham para a mesma população. Imprensa se compara com imprensa, produção acadêmica com
+  produção acadêmica. Cada fonte declara `"estrato"` na configuração (padrão: `geral`), e
+  o relatório sai por estrato. Para alinhar no tempo (o GDELT só cobre três meses),
+  `--desde` restringe a comparação a itens publicados ou capturados a partir da data.
+
 As ressalvas vão no relatório porque são parte do número:
 
 - **Os canais não são independentes.** Todos favorecem o que é popular e bem ligado.
@@ -27,7 +38,9 @@ import json
 import math
 import re
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass, field
+from datetime import date
 from itertools import combinations
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlsplit
@@ -103,33 +116,67 @@ class Estimativa:
         ]  # fmt: skip
 
 
-def calcular(saidas: Path, nivel_minimo: int = 2) -> Estimativa:
-    por_canal: dict[str, set[str]] = {}
-    vistas: set[str] = set()
-    curva: list[tuple[str, int, int]] = []
+def canal(fonte: str) -> str:
+    return fonte.split(":", 1)[0]
+
+
+def calcular(
+    saidas: Path,
+    nivel_minimo: int = 2,
+    estrato_de: Callable[[str], str] = lambda fonte: "geral",
+    desde: date | None = None,
+) -> dict[str, Estimativa]:
+    """Uma estimativa por estrato. `estrato_de` recebe o id da fonte."""
+    por_estrato: dict[str, Estimativa] = {}
+    vistas: dict[str, set[str]] = {}
     for pasta in sorted(Path(saidas).glob("*-rodar")):
         arquivo = pasta / "itens.jsonl"
         if not arquivo.exists():
             continue
-        antes = len(vistas)
+        antes = {e: len(v) for e, v in vistas.items()}
         for linha in arquivo.read_text(encoding="utf-8").splitlines():
             item = json.loads(linha)
             if item.get("situacao") != "triado" or (item.get("nivel") or 0) < nivel_minimo:
                 continue
+            publicado = item.get("publicado_em")
+            if desde and (not publicado or date.fromisoformat(publicado) < desde):
+                continue
+            estrato = estrato_de(item["fonte"])
+            est = por_estrato.setdefault(estrato, Estimativa({}))
             url = normalizar_url(item["url"])
-            por_canal.setdefault(item["fonte"], set()).add(url)
-            vistas.add(url)
-        curva.append((pasta.name.removesuffix("-rodar"), len(vistas) - antes, len(vistas)))
-    return Estimativa(por_canal, curva)
+            est.por_canal.setdefault(canal(item["fonte"]), set()).add(url)
+            vistas.setdefault(estrato, set()).add(url)
+        rodada = pasta.name.removesuffix("-rodar")
+        for estrato, urls in vistas.items():
+            novas = len(urls) - antes.get(estrato, 0)
+            por_estrato[estrato].curva.append((rodada, novas, len(urls)))
+    return por_estrato
 
 
-def relatorio(est: Estimativa) -> str:
-    total = len(est.observadas)
-    linhas = ["# Estimativa de cobertura", "", f"URLs distintas observadas: **{total}**.", ""]
-    if not est.por_canal:
+def relatorio(estratos: dict[str, Estimativa], desde: date | None = None) -> str:
+    linhas = ["# Estimativa de cobertura", ""]
+    if desde:
+        linhas += [f"Só itens publicados ou capturados a partir de {desde.isoformat()}.", ""]
+    if not estratos:
         return "\n".join([*linhas, "Nenhuma rodada com itens triados ainda."]) + "\n"
+    for nome, est in sorted(estratos.items()):
+        linhas += _estrato(nome, est)
+    linhas += [
+        "",
+        "## Como ler",
+        "",
+        "Os canais não são independentes, e a dependência puxa a estimativa para baixo: os "
+        "números acima são piso. Saturação de verdade é a curva achatar com canais novos "
+        "entrando, não só com os mesmos canais repetindo.",
+    ]
+    return "\n".join(linhas) + "\n"
 
-    linhas += ["## Por canal", "", "| Canal | URLs | Só neste canal |", "|---|---|---|"]
+
+def _estrato(nome: str, est: Estimativa) -> list[str]:
+    total = len(est.observadas)
+    linhas = [f"## Estrato `{nome}`", "", f"URLs distintas observadas: **{total}**.", ""]
+
+    linhas += ["| Canal | URLs | Só neste canal |", "|---|---|---|"]
     contagem = Counter(u for urls in est.por_canal.values() for u in urls)
     for canal, urls in sorted(est.por_canal.items()):
         exclusivas = sum(1 for u in urls if contagem[u] == 1)
@@ -139,11 +186,13 @@ def relatorio(est: Estimativa) -> str:
         f = est.frequencias
         linhas += [
             "",
-            "## Total estimado",
+            "**Total estimado**",
             "",
             f"- **Chao (piso, {len(est.por_canal)} canais):** {est.chao:,.0f} "
             f"(vistas por um canal só: {f.get(1, 0)}; por exatamente dois: {f.get(2, 0)}).",
-            f"- **Cobertura estimada:** {total / est.chao:.0%} do piso." if est.chao else "",
+            f"- **Cobertura:** no máximo {total / est.chao:.0%} (observadas ÷ piso)."
+            if est.chao
+            else "",
             "",
             "| Par | n1 | n2 | em comum | Chapman | IC 95% |",
             "|---|---|---|---|---|---|",
@@ -162,12 +211,6 @@ def relatorio(est: Estimativa) -> str:
     else:
         linhas += ["", "Com um canal só não há estimativa: é preciso ao menos dois."]
 
-    linhas += ["", "## Curva de acumulação", "", "| Rodada | Novas | Total |", "|---|---|---|"]
+    linhas += ["", "**Curva de acumulação**", "", "| Rodada | Novas | Total |", "|---|---|---|"]
     linhas += [f"| {r} | {novas} | {acum} |" for r, novas, acum in est.curva]
-    linhas += [
-        "",
-        "Os canais não são independentes, e a dependência puxa a estimativa para baixo: os "
-        "números acima são piso. Saturação de verdade é a curva achatar com canais novos "
-        "entrando, não só com os mesmos canais repetindo.",
-    ]
-    return "\n".join(linhas) + "\n"
+    return [*linhas, ""]

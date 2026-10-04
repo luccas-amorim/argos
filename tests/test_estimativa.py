@@ -1,4 +1,5 @@
 import json
+from datetime import date
 
 import pytest
 
@@ -41,36 +42,58 @@ def test_calcular_canais_chao_e_curva(tmp_path):
     saidas = tmp_path / "saidas"
     _rodada(saidas, "20261001T000000Z", [
         ("wayback:j", "https://web.archive.org/web/1999id_/http://j.br/1", 3),
-        ("wayback:j", "https://web.archive.org/web/1999id_/http://j.br/2", 2),
+        ("wayback:k", "https://web.archive.org/web/1999id_/http://k.br/2", 2),
         ("wayback:j", "https://web.archive.org/web/1999id_/http://j.br/ruido", 1),
     ])  # fmt: skip
     _rodada(saidas, "20261008T000000Z", [
         ("gdelt:c", "https://www.j.br/1", 3),
         ("gdelt:c", "https://k.br/9", 2),
+        ("rss:jornal", "https://k.br/9", 3),
         ("openalex:c", "https://doi.org/10.1/x", 3),
-        ("openalex:c", "https://k.br/9", 3),
     ])  # fmt: skip
     (saidas / "20261009T000000Z-retriar").mkdir()  # retriagem não é rodada de descoberta
 
-    est = estimativa.calcular(saidas)
-    assert est.por_canal["wayback:j"] == {"j.br/1", "j.br/2"}  # o nível 1 fica de fora
-    assert len(est.observadas) == 4
-    assert est.frequencias == {1: 2, 2: 2}
-    assert est.chao == 4 + 2 * 2 / (2 * 2)
-    assert est.curva == [("20261001T000000Z", 2, 2), ("20261008T000000Z", 2, 4)]
-    texto = estimativa.relatorio(est)
-    assert "URLs distintas observadas: **4**" in texto
-    assert "`gdelt:c` × `wayback:j` | 2 | 2 | 1 |" in texto
+    estrato = {"openalex:c": "academico"}
+    por_estrato = estimativa.calcular(saidas, estrato_de=lambda f: estrato.get(f, "imprensa"))
+    imprensa, academico = por_estrato["imprensa"], por_estrato["academico"]
+
+    # Dois domínios do Wayback são um canal só; o nível 1 fica de fora.
+    assert imprensa.por_canal["wayback"] == {"j.br/1", "k.br/2"}
+    assert set(imprensa.por_canal) == {"wayback", "gdelt", "rss"}
+    assert len(imprensa.observadas) == 3
+    assert imprensa.frequencias == {2: 2, 1: 1}
+    assert imprensa.chao == 3 + 1 * 1 / (2 * 2)
+    assert imprensa.curva == [("20261001T000000Z", 2, 2), ("20261008T000000Z", 1, 3)]
+    assert academico.chao is None  # um canal só no estrato: sem estimativa
+
+    texto = estimativa.relatorio(por_estrato)
+    assert "## Estrato `imprensa`" in texto and "## Estrato `academico`" in texto
+    assert "`gdelt` × `wayback` | 2 | 2 | 1 |" in texto
+
+
+def test_desde_alinha_no_tempo(tmp_path):
+    saidas = tmp_path / "saidas"
+    pasta = saidas / "20261001T000000Z-rodar"
+    pasta.mkdir(parents=True)
+    itens = [
+        {"fonte": "wayback:j", "url": "https://j.br/velha", "situacao": "triado", "nivel": 3,
+         "publicado_em": "2002-10-02"},
+        {"fonte": "wayback:j", "url": "https://j.br/nova", "situacao": "triado", "nivel": 3,
+         "publicado_em": "2026-09-30"},
+    ]  # fmt: skip
+    (pasta / "itens.jsonl").write_text("\n".join(json.dumps(i) for i in itens))
+    (est,) = estimativa.calcular(saidas, desde=date(2026, 7, 1)).values()
+    assert est.observadas == {"j.br/nova"}
 
 
 def test_um_canal_so_nao_estima(tmp_path):
     _rodada(tmp_path / "saidas", "20261001T000000Z", [("a", "https://x.br/1", 3)])
-    est = estimativa.calcular(tmp_path / "saidas")
-    assert est.chao is None
-    assert "ao menos dois" in estimativa.relatorio(est)
+    por_estrato = estimativa.calcular(tmp_path / "saidas")
+    assert por_estrato["geral"].chao is None
+    assert "ao menos dois" in estimativa.relatorio(por_estrato)
 
 
 def test_cli_estimar(cfg, capsys):
     assert cli.main(["estimar", "--config", str(cfg)]) == 0
-    assert "0 URLs observadas" in capsys.readouterr().out
+    assert "relatório em" in capsys.readouterr().out
     assert (cfg.parent / "dados" / "estimativa.md").exists()

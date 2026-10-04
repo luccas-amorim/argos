@@ -56,13 +56,19 @@ def _retriar(args: argparse.Namespace) -> int:
 
 def _estimar(args: argparse.Namespace) -> int:
     cfg = config.carregar(args.config)
-    est = estimativa.calcular(cfg.saidas, args.nivel_minimo)
-    texto = estimativa.relatorio(est)
+    estratos = {f["id"]: f.get("estrato", "geral") for f in cfg.fontes}
+    desde = date.fromisoformat(args.desde) if args.desde else None
+    por_estrato = estimativa.calcular(
+        cfg.saidas, args.nivel_minimo, lambda fonte: estratos.get(fonte, "geral"), desde
+    )
+    texto = estimativa.relatorio(por_estrato, desde)
     destino = cfg.diretorio / "estimativa.md"
     destino.parent.mkdir(parents=True, exist_ok=True)
     destino.write_text(texto, encoding="utf-8")
-    piso = f"{est.chao:,.0f}" if est.chao is not None else "sem estimativa (um canal só)"
-    print(f"{len(est.observadas)} URLs observadas; piso estimado: {piso}; relatório em {destino}")
+    for nome, est in sorted(por_estrato.items()):
+        piso = f"{est.chao:,.0f}" if est.chao is not None else "sem estimativa (um canal só)"
+        print(f"{nome}: {len(est.observadas)} URLs observadas; piso estimado: {piso}")
+    print(f"relatório em {destino}")
     return rodada.SEM_NADA
 
 
@@ -98,6 +104,7 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("estimar", help="quanto falta: captura e recaptura entre os canais")
     p.add_argument("--config", required=True)
     p.add_argument("--nivel-minimo", type=int, default=2)
+    p.add_argument("--desde", help="AAAA-MM-DD: só itens a partir desta data")
     p.set_defaults(func=_estimar)
 
     p = sub.add_parser("validar-lexico", help="confere o formato de um léxico")
