@@ -226,6 +226,8 @@ vive no próprio repositório.
   segundo canal acadêmico (Crossref ou OAI-PMH), Common Crawl pelo texto, saída
   arquivística. O consumidor é o repositório `observatory`.
 - **depois** saída issue no GitHub, nível opt-in com modelo (marcado), migração do `dou`.
+- **em estudo** precatórios: [cenários para decidir a expansão](docs/precatorios.md)
+  (leitura de tabela, retrato e diferença no tempo; o domínio num repositório próprio).
 
 ## Rodar
 
