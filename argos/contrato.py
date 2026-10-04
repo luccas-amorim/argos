@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """O contrato que todo adaptador de fonte cumpre.
 
 Três funções e um bloco de metadados. O motor não sabe o que é um tribunal
@@ -6,40 +5,54 @@ nem um jornal: sabe listar, baixar e perguntar se o que baixou está íntegro.
 Tudo o que for específico da origem fica dentro do adaptador, com fixture e
 teste que rodam sem rede.
 """
+
 from __future__ import annotations
 
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from datetime import date, datetime
-from typing import Iterable, Protocol
+from typing import Any, Protocol, runtime_checkable
 
 
 @dataclass(frozen=True)
 class Referencia:
     """O que `listar` devolve: o suficiente para decidir baixar, nada mais."""
-    fonte: str              # id do adaptador, p.ex. "datajud"
-    id_na_fonte: str        # identificador estável dentro da origem
+
+    fonte: str  # id do adaptador, p.ex. "datajud"
+    id_na_fonte: str  # identificador estável dentro da origem
     url: str
     titulo: str | None = None
     publicado_em: date | None = None
+    # O que a listagem já trouxe e o adaptador quer reaproveitar em `baixar`
+    # (p.ex. o registro inteiro de uma API). Não entra na igualdade.
+    dados: Mapping[str, Any] | None = field(default=None, compare=False, hash=False)
 
 
 @dataclass
 class Documento:
     """O que `baixar` devolve: o item inteiro, com proveniência."""
+
     ref: Referencia
-    texto: str                              # normalizado em UTF-8, sem marcação
+    texto: str  # normalizado em UTF-8, sem marcação
     capturado_em: datetime
-    hash_texto: str                         # sha256 do texto normalizado
-    bruto: bytes | None = None              # HTML/JSON cru, quando houver
+    hash_texto: str  # sha256 do texto normalizado
+    bruto: bytes | None = None  # HTML/JSON cru, quando houver
     cabecalhos: dict[str, str] = field(default_factory=dict)
+    # Trechos que a própria fonte marca como fortes: ementa, dispositivo,
+    # manchete, assuntos. Termo achado aqui é o que leva a triagem ao nível 3.
+    # Cada destaque também precisa estar no `texto`: a triagem conta termos no texto.
+    destaques: dict[str, str] = field(default_factory=dict)
 
 
+@runtime_checkable
 class Fonte(Protocol):
     """Um adaptador. Instâncias são configuradas pelo consumidor (chaves, consultas)."""
 
     id: str
-    limite_por_minuto: int      # declarado pelo adaptador; o motor obedece
-    respeita_robots: bool       # True, salvo fonte que publique API própria
+    limite_por_minuto: int  # declarado pelo adaptador; o motor obedece
+    respeita_robots: bool  # True, salvo fonte que publique API própria
+    # Opcional: `margem_dias: int`, quanto voltar antes da última rodada. Fonte que
+    # publica com atraso declara a sua; sem ela, vale a margem da configuração.
 
     def listar(self, desde: date) -> Iterable[Referencia]:
         """Enumera o que a fonte publicou a partir de `desde`.

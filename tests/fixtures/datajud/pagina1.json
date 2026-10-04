@@ -1,0 +1,48 @@
+{
+  "took": 12,
+  "timed_out": false,
+  "hits": {
+    "total": {"value": 2, "relation": "eq"},
+    "hits": [
+      {
+        "_index": "api_publica_stj",
+        "_id": "STJ_REsp_00012345620248260000",
+        "_source": {
+          "numeroProcesso": "00012345620248260000",
+          "tribunal": "STJ",
+          "grau": "SUP",
+          "nivelSigilo": 0,
+          "dataAjuizamento": "20240305000000",
+          "dataHoraUltimaAtualizacao": "2026-09-29T10:15:00.000Z",
+          "classe": {"codigo": 1032, "nome": "Recurso Especial"},
+          "orgaoJulgador": {"codigo": 1, "nome": "Sexta Turma"},
+          "assuntos": [
+            {"codigo": 3372, "nome": "Homicídio Qualificado"},
+            [{"codigo": 10949, "nome": "Tribunal do Júri"}]
+          ],
+          "movimentos": [
+            {"codigo": 26, "nome": "Distribuição", "dataHora": "2024-03-06T09:00:00.000Z"},
+            {"codigo": 237, "nome": "Provimento", "dataHora": "2026-09-28T16:40:00.000Z",
+             "complementosTabelados": [{"codigo": 4, "descricao": "tipo_de_documento", "valor": 78, "nome": "Acórdão"}]}
+          ]
+        },
+        "sort": [1727604900000]
+      },
+      {
+        "_index": "api_publica_stj",
+        "_id": "STJ_HC_00099999920268260000",
+        "_source": {
+          "numeroProcesso": "00099999920268260000",
+          "tribunal": "STJ",
+          "grau": "SUP",
+          "nivelSigilo": 1,
+          "dataHoraUltimaAtualizacao": "2026-09-30T08:00:00.000Z",
+          "classe": {"codigo": 307, "nome": "Habeas Corpus Criminal"},
+          "assuntos": [{"codigo": 3372, "nome": "Homicídio Qualificado"}],
+          "movimentos": []
+        },
+        "sort": [1727683200000]
+      }
+    ]
+  }
+}
