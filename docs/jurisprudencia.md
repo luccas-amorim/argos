@@ -1,5 +1,9 @@
 # Jurisprudência para o AtlasPen: STJ, STF e STM
 
+> **O AtlasPen é consultado, não editado** (decisão de 04/10/2026). O Argos lê
+> `data/crimes.json` e `data/diplomas.json` de lá e entrega o que achou; nada é escrito no
+> repositório do AtlasPen. Este plano mora aqui por isso.
+
 Pergunta de partida: o AtlasPen pode começar a se beneficiar de decisões do STJ, do STF e
 do STM que impactem o entendimento e a aplicação de normas penais, materiais e
 processuais?
@@ -9,7 +13,7 @@ no DJEN desde 28/11/2024 e mantém dados abertos com ementa e inteiro teor; o ST
 DataJud (a adesão ao DJEN está por conferir); o STF não está no DataJud nem no DJEN e
 bloqueia acesso automatizado à pesquisa de jurisprudência, o que exige um caminho
 próprio, descrito em [stf.md](stf.md). O motor e os adaptadores `datajud` e `djen` estão
-prontos; falta o gerador de léxico, que mora no AtlasPen.
+prontos, e o gerador de léxico está em `exemplos/atlaspen/`.
 
 **Restrição de infraestrutura, medida em 04/10/2026:** o DJEN recusa conexões de fora do
 Brasil (CloudFront com bloqueio por país), e o portal de dados abertos do STJ também
@@ -62,9 +66,10 @@ volume é pequeno.
 
 ## O léxico, gerado de `crimes.json`
 
-O léxico do AtlasPen não se escreve à mão: é gerado do catálogo, no repositório do
-AtlasPen (`scripts/robos/jurisprudencia/lexico.py`, como o README do Argos propõe). Para
-cada registro:
+O léxico do AtlasPen não se escreve à mão: é gerado do catálogo, lendo `data/crimes.json`
+e `data/diplomas.json` do AtlasPen, sem escrever nele. A ideia original, abaixo, era um
+termo por registro; o gerador escrito usa um termo por artigo de cada diploma (ver "Onde
+mora o gerador"). Para cada registro:
 
 - **`chave`**: o id do registro (append-only, como a URL pública), para que a saída do
   Argos se ligue ao tipo sem ambiguidade.
@@ -90,12 +95,19 @@ As normas **processuais** (CPP, LEP, Lei 9.099/95) não são tipos penais e não
    depende de IP brasileiro.
 2. **Adaptador `stj`** sobre os dados abertos: os espelhos têm a ementa, que é o
    destaque natural do nível 3 da triagem.
-3. **Gerador de léxico no AtlasPen**, com teste que o valide por
-   `argos validar-lexico`.
+3. ~~**Gerador de léxico**~~ **feito** em [`exemplos/atlaspen/lexico.py`](../exemplos/atlaspen/lexico.py),
+   lendo um clone do AtlasPen (ver "Onde mora o gerador"). Um
+   termo por artigo de cada diploma, com a citação na forma da jurisprudência
+   (`art. 121 … Código Penal`, `CP, art. 121`); nomes curtos em termo à parte, como
+   indício fraco; o CPM gerado como exclusão do CP. 1.531 de 1.531 registros
+   alcançáveis por citação.
 4. **Primeira rodada real** com `--desde` de alguns meses, só para medir o volume por
    nível antes de ligar o agendamento.
-5. **`mapear.py` no AtlasPen**: o JSONL de aceitos vira `data/jurisprudencia.json`, e o
-   que pede juízo vira pergunta na issue semanal, com a mesma regra dos outros robôs.
+5. ~~**`mapear.py`**~~ **feito** em `exemplos/atlaspen/mapear.py`: lê a rodada do Argos e escreve, registro por registro, o que foi achado por citação,
+   o que só pelo nome (pede juízo) e as fichas do DataJud. Não escreve em lugar nenhum
+   do AtlasPen.
+   O formato de um `data/jurisprudencia.json` é decisão do projeto, a tomar depois de
+   ver os primeiros relatórios reais.
 6. **STF**: o plano tem documento próprio, [stf.md](stf.md). O STF não está no DataJud:
    a versão anterior deste item sugeria buscar ADIs por lá, e estava errada.
 
@@ -110,3 +122,33 @@ As normas **processuais** (CPP, LEP, Lei 9.099/95) não são tipos penais e não
 - **Não gravar dado de parte.** Decisões penais trazem nomes de réus e vítimas. O corpus
   guarda o texto publicado, como a fonte publicou; o AtlasPen consome só a tese, o
   dispositivo e a referência do julgado.
+
+## Onde mora o gerador
+
+Em [`exemplos/atlaspen/`](../exemplos/atlaspen/), como exemplo de consumidor (decisão de
+04/10/2026). Leem um clone do AtlasPen e não escrevem nele. As lições do que foi escrito:
+
+- **Granularidade por artigo de cada diploma** (`cp-art-121`); a jurisprudência cita o
+  artigo, e raramente o inciso de um jeito casável.
+- **Citação com reticências** (`art. 121 … Código Penal`), e a ordem inversa **colada**
+  (`CP, art. 121`): com lacuna, "Código Penal. Condenação pelo art. 33 (...). Art. 205"
+  ligou o art. 205 do CPM ao CP.
+- **Nome do tipo em termo à parte**, de peso menor: "Homicídio qualificado" é nome no CPM
+  e aparece em ementa sobre o art. 121 do CP.
+- **Exclusão gerada dos dados**: apelido que é começo de outro ("Código Penal", "Código
+  Penal Militar") vira exclusão. Resultado na base de 04/10/2026: 1.144 termos, 1.531 de
+  1.531 registros alcançáveis por citação.
+
+## O que se mediu das fontes judiciais
+
+
+| Fonte | Adaptador | O que se mediu |
+|---|---|---|
+| DataJud (CNJ) | `datajud` | Índice carregado com atraso (no STM, o registro mais recente era de 11 dias antes) e lento (22 a 40 s por consulta no servidor). Margem padrão de 30 dias e tempo limite de 180 s. Sem texto de decisão. O STF não está no DataJud. |
+| DJEN (Comunica PJe) | `djen` | CloudFront com **bloqueio por país**: só responde a IP brasileiro. O STJ publica nele desde 28/11/2024; o STF não aderiu. |
+| Dados abertos do STJ | (a escrever) | Recusou acesso de fora do Brasil. |
+| STF | `lista` (teses, súmulas) | Pesquisa de jurisprudência atrás de WAF, que o Argos não contorna. Plano em [stf.md](stf.md). |
+
+Consequência prática: rodada que use DJEN ou dados do STJ precisa sair de IP brasileiro
+(runner próprio registrado no GitHub Actions, máquina local ou VM em região de São
+Paulo). O Argos acusa o caso com `BloqueadoPorPais`.

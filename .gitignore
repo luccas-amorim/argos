@@ -5,3 +5,5 @@ __pycache__/
 .venv/
 # Diretórios de trabalho de uma rodada local (estado, corpus, saídas).
 dados/
+exemplos/atlaspen/lexico.json
+dados-atlaspen/

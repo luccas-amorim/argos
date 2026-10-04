@@ -1,5 +1,9 @@
 # STF: plano
 
+> O adaptador `lista` (fontes A e B abaixo) já existe no Argos. O AtlasPen é consultado,
+> não editado: o `avisos.json` citado abaixo é lido de lá, e o que o robô achar vai como
+> relatório, nunca como alteração no AtlasPen.
+
 O STF é o tribunal mais difícil dos três, e o que mais importa ao catálogo do AtlasPen:
 uma ADI pode tirar um tipo penal do ordenamento, uma tese de repercussão geral muda a
 aplicação de um atributo em todo o país. Este documento separa o que se sabe, o que
@@ -29,8 +33,9 @@ O recorte é pequeno, e isso ajuda: **centenas de itens por ano, não milhares.*
 4. **Julgados paradigmáticos** em HC e RHC, que o próprio Tribunal destaca no Informativo.
 
 O `data/avisos.json` do AtlasPen já registra "ADI em curso" e "tese de repercussão
-geral" com a data em que a fonte foi consultada. O robô do STF é quem mantém esse
-arquivo honesto: o que ele achar vira pergunta na issue semanal, nunca dado direto.
+geral" com a data em que a fonte foi consultada. O robô do STF **lê** esse arquivo para
+saber o que acompanhar, e entrega relatório: o que mudou numa ADI, tese nova ou
+alterada. Levar isso ao AtlasPen é decisão de quem mantém o AtlasPen.
 
 ## Fontes candidatas, por ordem de valor sobre custo
 
@@ -68,7 +73,7 @@ declarado e código público, é o tipo de consumidor que essas políticas dizem
 1. **Sondagem com IP brasileiro** das fontes A a F: status, `robots.txt`, presença de
    desafio anti-robô, formato, paginação. Uma resposta real de cada fonte que responder
    vira fixture, como a do DataJud do STM.
-2. **Adaptador `lista`** e as fontes A e B. É o menor esforço com o maior ganho: teses e
+2. ~~**Adaptador `lista`**~~ **feito no Argos**; faltam as fontes A e B configuradas. É o menor esforço com o maior ganho: teses e
    súmulas mudam pouco e cada mudança importa.
 3. **Fonte E** sobre as ações do `avisos.json`, se o acompanhamento processual responder.
 4. **Fonte D** (Informativo), para os julgados que não são tese nem controle concentrado.
