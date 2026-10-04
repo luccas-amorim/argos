@@ -211,8 +211,8 @@ corpus possa entrar no grafo sem retrabalho.
 ## Roadmap
 
 Os dois usos têm plano próprio, com fontes, recorte e ordem de trabalho:
-[jurisprudência para o AtlasPen](https://github.com/luccas-amorim/atlaspen/blob/main/.superpowers/specs/2026-10-04-jurisprudencia.md)
-(o que se mediu das fontes judiciais está em [docs/jurisprudencia.md](docs/jurisprudencia.md)) e [observatório do Carandiru](https://github.com/luccas-amorim/observatory), que
+[jurisprudência para o AtlasPen](docs/jurisprudencia.md) (com o [plano do STF](docs/stf.md)
+à parte; o AtlasPen é lido, nunca editado) e [observatório do Carandiru](https://github.com/luccas-amorim/observatory), que
 vive no próprio repositório.
 
 - **v0.1** (feita; primeira rodada real contra o DataJud do STM em 04/10/2026) motor: contrato, captura com `.part` e sentinela, léxico com schema e
