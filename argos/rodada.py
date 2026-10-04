@@ -173,7 +173,7 @@ def rodar(
 ) -> Rodada:
     hoje = hoje or date.today()
     rodada = nova_rodada(casador, "rodar", agora)
-    corpus = Corpus(config.corpus, guardar=config.guardar_texto)
+    corpus = Corpus(config.corpus)
     for fonte in fontes:
         memoria = estado.ler(config.estado, fonte.id) if usar_estado else estado.Estado(fonte.id)
         inicio = desde

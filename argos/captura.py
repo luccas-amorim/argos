@@ -81,15 +81,10 @@ class Corpus:
     O mesmo texto chegando por outro id da mesma fonte (republicação) cai no mesmo
     arquivo, e a referência gravada passa a ser a da captura mais recente. O relatório e
     o JSONL da rodada guardam as duas.
-
-    Com `guardar=False` nada é gravado: a sentinela confere o documento em memória, a
-    triagem lê o texto e ele é descartado. É a escolha de quem quer só o catálogo (URL e
-    identificadores), ao preço de não poder retriar sem baixar de novo.
     """
 
-    def __init__(self, raiz: Path, guardar: bool = True) -> None:
+    def __init__(self, raiz: Path) -> None:
         self.raiz = Path(raiz)
-        self.guardar = guardar
 
     def relativo(self, caminho: Path | None) -> str | None:
         """Caminho como vai para a saída: relativo ao diretório de dados, portável."""
@@ -100,10 +95,8 @@ class Corpus:
     def caminho(self, doc: Documento) -> Path:
         return self.raiz / nome_seguro(doc.ref.fonte) / f"{doc.hash_texto}.json"
 
-    def gravar(self, doc: Documento, fonte: Fonte) -> tuple[bool, Path | None]:
+    def gravar(self, doc: Documento, fonte: Fonte) -> tuple[bool, Path]:
         """(íntegro, caminho). Grava `.part`, pergunta à sentinela, promove se passar."""
-        if not self.guardar:
-            return fonte.sentinela(doc), None
         final = self.caminho(doc)
         final.parent.mkdir(parents=True, exist_ok=True)
         parcial = final.with_suffix(".json.part")

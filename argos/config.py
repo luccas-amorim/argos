@@ -5,8 +5,6 @@
       "diretorio": "dados",
       "desde": "2026-09-01",
       "margem_dias": 2,
-      "guardar_texto": true,
-      "catalogo": {"arquivo": "catalogo.csv", "nivel_minimo": 2},
       "fontes": [{"tipo": "rss", "id": "rss:exemplo", "url": "https://..."}]
     }
 
@@ -31,16 +29,6 @@ class Config:
     # Quanto voltar antes da última rodada: fonte que publica com atraso ou com data
     # retroativa não escapa. O estado impede a releitura do que já foi visto.
     margem_dias: int = 2
-    # False: o texto integral é lido, triado e descartado; nada vai para `corpus/`.
-    guardar_texto: bool = True
-    # {"arquivo": "catalogo.csv", "nivel_minimo": 2}: mantém o catálogo CSV cumulativo.
-    catalogo: dict | None = None
-
-    @property
-    def catalogo_csv(self) -> Path | None:
-        if not self.catalogo:
-            return None
-        return self.diretorio / self.catalogo.get("arquivo", "catalogo.csv")
 
     @property
     def estado(self) -> Path:
@@ -71,6 +59,4 @@ def carregar(caminho: str | Path) -> Config:
         fontes=tuple(fontes),
         desde=date.fromisoformat(dados["desde"]) if dados.get("desde") else None,
         margem_dias=int(dados.get("margem_dias", 2)),
-        guardar_texto=bool(dados.get("guardar_texto", True)),
-        catalogo=dados.get("catalogo"),
     )

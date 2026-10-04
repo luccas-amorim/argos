@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "argos"
 version = "0.1.0"
-description = "Vigilância determinística de fontes abertas, com léxico como dado e descarte auditável."
+description = "Vigilância determinística dos tribunais superiores e do CNJ para o AtlasPen, com léxico como dado e descarte auditável."
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "Luccas de Amorim" }]
