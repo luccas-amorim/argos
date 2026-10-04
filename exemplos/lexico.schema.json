@@ -22,7 +22,7 @@
           "formas": {
             "type": "array", "minItems": 1,
             "items": { "type": "string", "minLength": 1 },
-            "description": "Grafias que contam como o termo. Sem distinção de maiúsculas e acentos; palavra inteira."
+            "description": "Grafias que contam como o termo. Sem distinção de maiúsculas e acentos; palavra inteira. Reticências (…) valem até 60 caracteres quaisquer, sem atravessar ponto e vírgula nem quebra de linha: 'art. 121 … Código Penal'."
           },
           "exclusoes": {
             "type": "array",

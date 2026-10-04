@@ -135,7 +135,9 @@ rede. Fonte que muda de forma quebra o teste, não a rodada em silêncio.
 ```
 
 O casamento ignora maiúsculas e acentos, exige palavra inteira e tolera quebra de linha
-onde a forma tem espaço. Ocorrência que cai dentro de uma `exclusao` não conta. As
+onde a forma tem espaço. Reticências (`…`) valem até 60 caracteres quaisquer, para casar
+citações como "art. 121, § 2º, IV, do Código Penal" com a forma `art. 121 … Código Penal`.
+Ocorrência que cai dentro de uma `exclusao` não conta. As
 `categorias` (opcionais) são facetas de catalogação e vão para a saída junto com a chave.
 
 O léxico tem dono fora deste repositório. O do AtlasPen é gerado a partir de

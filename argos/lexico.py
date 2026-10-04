@@ -7,6 +7,12 @@ abaixo aplica as mesmas regras sem depender de biblioteca de JSON Schema, e o te
 O casamento é por palavra inteira, sem distinguir maiúsculas nem acentos, e tolera
 quebra de linha ou espaço duplo onde a forma tem um espaço ("art.  121" casa "art. 121").
 Uma ocorrência que cai dentro de uma exclusão do mesmo termo não conta.
+
+Reticências (`…`, um caractere só) numa forma valem até 60 caracteres quaisquer, sem
+atravessar ponto e vírgula nem quebra de linha (o ponto atravessa, por causa de
+"inc."). Assim "art. 121 … Código Penal" casa "art. 121, § 2º, IV, do Código Penal",
+que é como a jurisprudência cita. As exclusões aceitam o mesmo:
+"art. 121 … Código Penal Militar" anula a ocorrência que, na verdade, é do CPM.
 """
 
 from __future__ import annotations
@@ -146,12 +152,29 @@ def carregar(caminho: str | Path) -> Lexico:
     return de_dados(dados)
 
 
+# "…" numa forma: até este tanto de qualquer coisa entre as partes. É o que deixa
+# "art. 121 … Código Penal" casar "art. 121, § 2º, IV, do Código Penal".
+RETICENCIAS = "…"
+JANELA_RETICENCIAS = 60
+
+
+def _trecho(parte: str) -> str:
+    return r"\s+".join(map(re.escape, parte.split()))
+
+
+def _forma(forma: str) -> str:
+    partes = [p.strip() for p in dobrar(forma.strip()).split(RETICENCIAS)]
+    # Cada parte fecha e abre em fronteira de palavra: "art. 121 … CP" não casa "art. 1210".
+    lacuna = rf"(?!\w)[^;\n]{{0,{JANELA_RETICENCIAS}}}?(?<!\w)"
+    return lacuna.join(_trecho(p) for p in partes if p)
+
+
 def _padrao(formas: tuple[str, ...]) -> re.Pattern[str] | None:
     if not formas:
         return None
     # Mais longa primeiro: "art. 121 do Código Penal" ganha de "art. 121" na mesma posição.
-    partes = sorted({dobrar(f.strip()) for f in formas}, key=len, reverse=True)
-    alternativas = "|".join(r"\s+".join(map(re.escape, p.split())) for p in partes)
+    partes = sorted({f.strip() for f in formas}, key=len, reverse=True)
+    alternativas = "|".join(_forma(p) for p in partes)
     return re.compile(rf"(?<!\w)(?:{alternativas})(?!\w)")
 
 

@@ -105,3 +105,33 @@ def test_forma_mais_longa_vence_na_mesma_posicao():
 def test_contexto_ausente_no_lexico_nao_exige_nada():
     lex = lexico.de_dados({"id": "x", "versao": "1", "termos": [{"chave": "a", "formas": ["a"]}]})
     assert lexico.Casador(lex).contexto("qualquer coisa") is True
+
+
+@pytest.mark.parametrize(
+    ("texto", "validas", "anuladas"),
+    [
+        ("nos termos do art. 121, § 2º, inc. IV, do Código Penal.", 1, 0),
+        ("art. 121, caput, do CP", 1, 0),
+        ("art. 121 do Código Penal Militar", 0, 1),  # a exclusão também usa reticências
+        ("art. 1210 do CP", 0, 0),  # fronteira de palavra nas duas pontas da lacuna
+        ("art. 121, § 2º, do CPM", 0, 0),
+        ("art. 121; e o Código Penal", 0, 0),  # ponto e vírgula fecha a lacuna
+        ("art. 121 " + "x" * 70 + " do Código Penal", 0, 0),  # lacuna maior que 60
+    ],
+)
+def test_reticencias_como_jurisprudencia_cita(texto, validas, anuladas):
+    lex = lexico.de_dados(
+        {
+            "id": "x",
+            "versao": "1",
+            "termos": [
+                {
+                    "chave": "cp-art-121",
+                    "formas": ["art. 121 … Código Penal", "art. 121 … CP"],
+                    "exclusoes": ["art. 121 … Código Penal Militar"],
+                }
+            ],
+        }
+    )
+    v, a = _casar(lex, texto)
+    assert (len(v), len(a)) == (validas, anuladas)
