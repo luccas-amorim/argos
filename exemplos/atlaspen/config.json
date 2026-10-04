@@ -1,0 +1,23 @@
+{
+  "lexico": "lexico.json",
+  "diretorio": "../../dados-atlaspen",
+  "desde": "2026-09-01",
+  "fontes": [
+    {
+      "tipo": "djen",
+      "id": "djen:stj",
+      "tribunal": "STJ",
+      "tipos_documento": [
+        "Acórdão"
+      ],
+      "limite_por_minuto": 20,
+      "estrato": "stj"
+    },
+    {
+      "tipo": "datajud",
+      "id": "datajud:stm",
+      "tribunal": "stm",
+      "limite_por_minuto": 30
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+ "_meta": {
+  "gerado_em": "2026-07-19",
+  "gerado_por": "scripts/inventario_diplomas.py",
+  "unidade": "preceito secundário: cada cominação de pena vigente no texto compilado do Planalto. Tipos do catálogo desdobram incisos e condutas, então tipos_catalogados pode legitimamente exceder preceitos_esperados.",
+  "fonte": "Textos compilados oficiais de planalto.gov.br (ccivil_03), texto vigente (revogações riscadas excluídas), conferidos em 2026-07-19.",
+  "total_preceitos_esperados": 1172,
+  "extrato": "Recorte de data/diplomas.json do AtlasPen, para teste do Argos."
+ },
+ "diplomas": [
+  {
+   "id": "cp",
+   "nome": "Código Penal — Parte Especial",
+   "norma": "Decreto-Lei nº 2.848, de 7 de dezembro de 1940",
+   "situacao": "vigente",
+   "fonte_url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848compilado.htm",
+   "conferido_em": "2026-07-19",
+   "artigos_penais": "arts. 121–126, 129–140, 146–166, 168–169, 171–180, 184, 197–213, 215–218, 227–230, 232–239, 241–257, 259–262, 264–278, 280, 282–284, 286–294, 296–326, 328–349, 351–359",
+   "preceitos_medidos": 337,
+   "preceitos_esperados": 337,
+   "tipos_catalogados": 454,
+   "rotulos_catalogo": [
+    "CP",
+    "CP (atualiz.)",
+    "Lei 14.133/21",
+    "Lei 14.811/24",
+    "Lei 14.478/22"
+   ],
+   "obs": "Inclui os tipos inseridos por leis posteriores (337-E a 337-P, 146-A, 171-A, 359-I a 359-T), rotulados no catálogo pela lei que os criou."
+  },
+  {
+   "id": "cpm",
+   "nome": "Código Penal Militar — Parte Especial",
+   "norma": "Decreto-Lei nº 1.001, de 21 de outubro de 1969",
+   "situacao": "vigente",
+   "fonte_url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del1001compilado.htm",
+   "conferido_em": "2026-07-19",
+   "artigos_penais": "arts. 136–152, 154–158, 160–187, 190–217, 219, 222–230, 232, 234–235, 238–246, 248–249, 251–252, 254–255, 257–259, 261–265, 267–276, 278–284, 286–288, 290–408",
+   "preceitos_medidos": 351,
+   "preceitos_esperados": 351,
+   "tipos_catalogados": 352,
+   "rotulos_catalogo": [
+    "CPM (DL 1.001/69)"
+   ],
+   "obs": "Crimes militares em tempo de paz (136–354) e de guerra (355–408)."
+  },
+  {
+   "id": "lei11343",
+   "nome": "Lei de Drogas",
+   "norma": "Lei nº 11.343, de 23 de agosto de 2006",
+   "situacao": "vigente",
+   "fonte_url": "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2006/lei/l11343.htm",
+   "conferido_em": "2026-07-19",
+   "artigos_penais": "arts. 33–39",
+   "preceitos_medidos": 9,
+   "preceitos_esperados": 10,
+   "ajuste_motivo": "O art. 28 não comina pena privativa (sanções dos incisos I a III) e por isso não tem linha 'Pena —'; soma-se 1 aos 9 preceitos medidos.",
+   "tipos_catalogados": 16,
+   "rotulos_catalogo": [
+    "Lei 11.343/06"
+   ]
+  },
+  {
+   "id": "lei9455",
+   "nome": "Tortura",
+   "norma": "Lei nº 9.455, de 7 de abril de 1997",
+   "situacao": "vigente",
+   "fonte_url": "https://www.planalto.gov.br/ccivil_03/leis/l9455.htm",
+   "conferido_em": "2026-07-19",
+   "artigos_penais": "arts. 1",
+   "preceitos_medidos": 1,
+   "preceitos_esperados": 4,
+   "ajuste_motivo": "Só o caput tem linha 'Pena —'; §2º (omissão, detenção 1–4), §3º-lesão grave (reclusão 4–10) e §3º-morte (reclusão 8–16) cominam em linha corrida.",
+   "tipos_catalogados": 5,
+   "rotulos_catalogo": [
+    "Lei 9.455/97"
+   ]
+  }
+ ]
+}

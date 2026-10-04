@@ -13,7 +13,7 @@ no DJEN desde 28/11/2024 e mantém dados abertos com ementa e inteiro teor; o ST
 DataJud (a adesão ao DJEN está por conferir); o STF não está no DataJud nem no DJEN e
 bloqueia acesso automatizado à pesquisa de jurisprudência, o que exige um caminho
 próprio, descrito em [stf.md](stf.md). O motor e os adaptadores `datajud` e `djen` estão
-prontos; o gerador de léxico está escrito e espera casa (ver "Onde mora o gerador").
+prontos, e o gerador de léxico está em `exemplos/atlaspen/`.
 
 **Restrição de infraestrutura, medida em 04/10/2026:** o DJEN recusa conexões de fora do
 Brasil (CloudFront com bloqueio por país), e o portal de dados abertos do STJ também
@@ -95,15 +95,15 @@ As normas **processuais** (CPP, LEP, Lei 9.099/95) não são tipos penais e não
    depende de IP brasileiro.
 2. **Adaptador `stj`** sobre os dados abertos: os espelhos têm a ementa, que é o
    destaque natural do nível 3 da triagem.
-3. **Gerador de léxico**: escrito e testado contra os dados reais, **ainda sem casa**
-   (o AtlasPen não recebe código deste trabalho; ver "Onde mora o gerador"). Um
+3. ~~**Gerador de léxico**~~ **feito** em [`exemplos/atlaspen/lexico.py`](../exemplos/atlaspen/lexico.py),
+   lendo um clone do AtlasPen (ver "Onde mora o gerador"). Um
    termo por artigo de cada diploma, com a citação na forma da jurisprudência
    (`art. 121 … Código Penal`, `CP, art. 121`); nomes curtos em termo à parte, como
    indício fraco; o CPM gerado como exclusão do CP. 1.531 de 1.531 registros
    alcançáveis por citação.
 4. **Primeira rodada real** com `--desde` de alguns meses, só para medir o volume por
    nível antes de ligar o agendamento.
-5. **`mapear.py`**, escrito junto com o gerador e na mesma situação: lê a rodada do Argos e escreve, registro por registro, o que foi achado por citação,
+5. ~~**`mapear.py`**~~ **feito** em `exemplos/atlaspen/mapear.py`: lê a rodada do Argos e escreve, registro por registro, o que foi achado por citação,
    o que só pelo nome (pede juízo) e as fichas do DataJud. Não escreve em lugar nenhum
    do AtlasPen.
    O formato de um `data/jurisprudencia.json` é decisão do projeto, a tomar depois de
@@ -125,8 +125,8 @@ As normas **processuais** (CPP, LEP, Lei 9.099/95) não são tipos penais e não
 
 ## Onde mora o gerador
 
-O gerador de léxico e o mapa de volta ao catálogo leem o AtlasPen e não escrevem nele, então
-podem morar fora dele. Lições do que foi escrito, que valem onde quer que ele fique:
+Em [`exemplos/atlaspen/`](../exemplos/atlaspen/), como exemplo de consumidor (decisão de
+04/10/2026). Leem um clone do AtlasPen e não escrevem nele. As lições do que foi escrito:
 
 - **Granularidade por artigo de cada diploma** (`cp-art-121`); a jurisprudência cita o
   artigo, e raramente o inciso de um jeito casável.

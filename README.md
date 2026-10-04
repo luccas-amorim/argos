@@ -219,8 +219,9 @@ vive no próprio repositório.
   validação, triagem em níveis, estado, saída JSONL, relatório em dois tamanhos.
   Um adaptador de cada família para provar o contrato: `rss` (genérico) e `datajud`.
 - **v0.2** jurisprudência: `djen` (**feito**, falta rodada real com IP brasileiro),
-  `lista` e as fontes do STF, `stj` com fixtures; exemplo de consumidor em
-  `exemplos/atlaspen/`. Primeira rodada real contra o léxico gerado de `crimes.json`.
+  `lista` (**feito**) e as fontes do STF, `stj` com fixtures; exemplo de consumidor em
+  `exemplos/atlaspen/` (**feito**: gerador de léxico e mapa de volta, lendo o AtlasPen sem
+  escrever nele). Primeira rodada real contra o léxico gerado de `crimes.json`.
   Catálogo CSV cumulativo e modo sem texto (**feitos**), pedidos pelo observatório.
 - **v0.3** observatório: `wayback`, `openalex`, `gdelt` e `argos estimar` (**feitos**);
   segundo canal acadêmico (Crossref ou OAI-PMH), Common Crawl pelo texto, saída

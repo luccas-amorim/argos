@@ -28,4 +28,5 @@ fixture sintética supunha. Só traz metadado processual público (classe, assun
 | `wayback/captura.html`, `nao-arquivada.html` | cópia arquivada (modo `id_`) e a página de "não arquivada" servida com 200 |
 | `openalex/p1.json`, `p2.json` | `/works` com resumo em índice invertido e paginação por cursor |
 | `gdelt/dia.json` | `artlist` em JSON do DOC 2.0 |
+| `atlaspen/data/` | **real**: recorte de `crimes.json` e `diplomas.json` do AtlasPen (73 registros de sete artigos), copiado sem alteração do clone em 04/10/2026; CC BY 4.0, Luccas de Amorim |
 | `lexico-carandiru.json` | léxico de amostra; o real é mantido pela pesquisa |
