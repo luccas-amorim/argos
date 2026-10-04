@@ -1,7 +1,9 @@
 # Precatórios: cenários para decidir a expansão
 
-Esboço para direcionar, não plano. A pergunta que ele quer ajudar a responder: **vale
-levar o Argos aos precatórios, e por qual cenário começar?**
+Esboço para direcionar, não plano. **Decidido em 04/10/2026:** o Argos ganha estudos de
+precatórios e processamento de grandes volumes de dados em planilha, como funcionalidade
+adicional à vigilância dos tribunais para o AtlasPen. A pergunta que fica: **por qual
+cenário começar?**
 
 ## Por que é outro bicho
 
@@ -94,18 +96,19 @@ beneficiário, por determinação do CNJ) com processos e outras fontes. É exat
 cruzamento para montar perfil de pessoa que o README do Argos veda. Os cenários A, B e C
 não precisam disso.
 
-## Onde isso moraria
+## Onde isso mora
 
-O mesmo desenho do AtlasPen e do observatório: **o que é geral fica no Argos, o que é do
-domínio fica no consumidor.**
+**No Argos** (decisão de 04/10/2026), em duas camadas:
 
-- **No Argos**, e só se o primeiro cenário provar que serve: leitura de tabela (PDF e
-  XLSX), retrato tabular guardado e diferença entre retratos. São peças que outros
-  consumidores também usariam (listas do STF, por exemplo).
-- **Num repositório próprio**: o esquema dos precatórios, o leitor de cada tribunal, as
-  regras de natureza alimentar e prioridade, o regime especial, os relatórios.
-- **O cenário C pode ser outra ferramenta**, irmã do Argos, porque não vigia nada: entra
-  arquivo, sai tabela limpa com relatório.
+- **Peças gerais**: leitura de tabela (PDF e XLSX), retrato tabular guardado, diferença
+  entre retratos, validadores (número CNJ, moeda, data). Servem também à vigilância dos
+  tribunais: as listas do STF são tabela, e o `lista` já dá o primeiro passo.
+- **O domínio dos precatórios**: o esquema, o leitor de cada tribunal, as regras de
+  natureza alimentar e prioridade, o regime especial, os relatórios. Mora num
+  subpacote próprio, para não se misturar com a vigilância de jurisprudência.
+
+O cenário C (planilhas) não vigia nada: entra arquivo, sai tabela limpa com relatório.
+Por isso ganha comando próprio, ao lado de `rodar`, e não uma fonte.
 
 ## O que decidir
 

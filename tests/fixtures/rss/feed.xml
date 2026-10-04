@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>Jornal de Exemplo</title>
-    <link>https://jornal.exemplo.br/</link>
+    <title>Tribunal de Exemplo: notícias</title>
+    <link>https://tribunal.exemplo.jus.br/</link>
     <item>
-      <title>Massacre do Carandiru: 34 anos depois, julgamento segue sem fim</title>
-      <link>https://jornal.exemplo.br/2026/10/carandiru-34-anos</link>
-      <guid isPermaLink="false">jornal-1001</guid>
+      <title>Terceira Seção fixa tese sobre furto qualificado em recurso repetitivo</title>
+      <link>https://tribunal.exemplo.jus.br/noticias/2026/10/tese-furto-qualificado</link>
+      <guid isPermaLink="false">noticia-1001</guid>
       <pubDate>Fri, 02 Oct 2026 09:00:00 -0300</pubDate>
       <description>Resumo curto que não deve decidir nada.</description>
     </item>
     <item>
-      <title>Prefeitura anuncia obras de drenagem</title>
-      <link>https://jornal.exemplo.br/2026/10/drenagem</link>
-      <guid isPermaLink="false">jornal-1002</guid>
+      <title>Tribunal promove semana de conciliação</title>
+      <link>https://tribunal.exemplo.jus.br/noticias/2026/10/conciliacao</link>
+      <guid isPermaLink="false">noticia-1002</guid>
       <pubDate>Thu, 01 Oct 2026 18:30:00 -0300</pubDate>
     </item>
     <item>
       <title>Página que sumiu</title>
-      <link>https://jornal.exemplo.br/2026/10/sumiu</link>
-      <guid isPermaLink="false">jornal-1003</guid>
+      <link>https://tribunal.exemplo.jus.br/noticias/2026/10/sumiu</link>
+      <guid isPermaLink="false">noticia-1003</guid>
       <pubDate>Thu, 01 Oct 2026 12:00:00 -0300</pubDate>
     </item>
     <item>
       <title>Notícia antiga</title>
-      <link>https://jornal.exemplo.br/2026/08/antiga</link>
-      <guid isPermaLink="false">jornal-0900</guid>
+      <link>https://tribunal.exemplo.jus.br/noticias/2026/08/antiga</link>
+      <guid isPermaLink="false">noticia-0900</guid>
       <pubDate>Mon, 03 Aug 2026 10:00:00 -0300</pubDate>
     </item>
   </channel>

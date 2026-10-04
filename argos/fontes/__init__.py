@@ -5,11 +5,8 @@ from __future__ import annotations
 from argos.contrato import Fonte
 from argos.fontes.datajud import DataJud
 from argos.fontes.djen import Djen
-from argos.fontes.gdelt import Gdelt
 from argos.fontes.lista import Lista
-from argos.fontes.openalex import OpenAlex
 from argos.fontes.rss import Rss
-from argos.fontes.wayback import Wayback
 from argos.http import Transporte, transporte_urllib
 
 TIPOS = {
@@ -17,9 +14,6 @@ TIPOS = {
     "datajud": DataJud,
     "djen": Djen,
     "lista": Lista,
-    "wayback": Wayback,
-    "openalex": OpenAlex,
-    "gdelt": Gdelt,
 }
 
 

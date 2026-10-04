@@ -62,13 +62,13 @@ def fixtures() -> Path:
 
 @pytest.fixture
 def cfg(tmp_path, fixtures):
-    """Configuração mínima: um feed RSS e o léxico de amostra do Carandiru."""
-    shutil.copy(fixtures / "lexico-carandiru.json", tmp_path / "lexico.json")
+    """Configuração mínima: o feed de notícias de um tribunal e um léxico penal de amostra."""
+    shutil.copy(fixtures / "lexico-penal.json", tmp_path / "lexico.json")
     dados = {
         "lexico": "lexico.json",
         "diretorio": "dados",
         "desde": "2026-09-01",
-        "fontes": [{"tipo": "rss", "id": "rss:jornal", "url": FEED, "minimo_caracteres": 200}],
+        "fontes": [{"tipo": "rss", "id": "rss:tribunal", "url": FEED, "minimo_caracteres": 200}],
     }
     caminho = tmp_path / "config.json"
     caminho.write_text(json.dumps(dados), encoding="utf-8")
@@ -76,9 +76,9 @@ def cfg(tmp_path, fixtures):
 
 
 @pytest.fixture
-def rede_jornal(rede, fixtures):
+def rede_tribunal(rede, fixtures):
     rede.responder(FEED, fixtures / "rss" / "feed.xml")
-    rede.responder(f"{BASE}/carandiru-34-anos", fixtures / "rss" / "materia-carandiru.html")
-    rede.responder(f"{BASE}/drenagem", fixtures / "rss" / "materia-outra.html")
+    rede.responder(f"{BASE}/tese-furto-qualificado", fixtures / "rss" / "noticia-tese.html")
+    rede.responder(f"{BASE}/conciliacao", fixtures / "rss" / "noticia-outra.html")
     rede.responder(f"{BASE}/sumiu", fixtures / "rss" / "erro-200.html")
     return rede

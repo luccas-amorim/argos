@@ -4,8 +4,8 @@ from datetime import date
 
 from argos import config, fontes, lexico, rodada
 
-FEED = "https://jornal.exemplo.br/feed"
-BASE = "https://jornal.exemplo.br/2026/10"
+FEED = "https://tribunal.exemplo.jus.br/rss"
+BASE = "https://tribunal.exemplo.jus.br/noticias/2026/10"
 
 
 def _rodar(caminho, rede, **kw):

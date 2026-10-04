@@ -12,7 +12,7 @@ REF = Referencia(fonte="teste", id_na_fonte="1", url="https://exemplo.br/1")
 
 @pytest.fixture
 def casador(fixtures):
-    return lexico.Casador(lexico.carregar(fixtures / "lexico-carandiru.json"))
+    return lexico.Casador(lexico.carregar(fixtures / "lexico-penal.json"))
 
 
 def _doc(texto, **destaques):
@@ -22,27 +22,32 @@ def _doc(texto, **destaques):
 
 
 def test_nivel_0_sem_termo(casador):
-    r = triar(_doc("A prefeitura anunciou obras de drenagem."), casador)
+    r = triar(_doc("O tribunal promove semana de conciliação."), casador)
     assert (r.nivel, r.motivo, r.trecho) == (0, "sem_termo", None)
 
 
 def test_nivel_0_so_exclusao_sai_com_trecho(casador):
-    r = triar(_doc("Sessão de cinema: Carandiru, o filme, com debate."), casador)
+    r = triar(_doc("Denúncia por homicídio culposo na direção de veículo automotor."), casador)
     assert (r.nivel, r.motivo) == (0, "so_exclusao")
-    assert "o filme" in r.trecho
+    assert "na direção" in r.trecho
+
+
+def test_nivel_0_cpm_nao_vira_cp(casador):
+    r = triar(_doc("Acórdão: recurso sobre o art. 155, § 1º, do Código Penal Militar."), casador)
+    assert (r.nivel, r.motivo) == (0, "so_exclusao")
 
 
 def test_nivel_1_termo_sem_contexto(casador):
-    r = triar(_doc("O bairro do Carandiru ganhou uma feira de artesanato."), casador)
-    assert (r.nivel, r.motivo, r.chaves) == (1, "sem_contexto", ["massacre-do-carandiru"])
-    assert "Carandiru" in r.trecho
+    r = triar(_doc("O art. 155 do Código Penal foi assunto de palestra no auditório."), casador)
+    assert (r.nivel, r.motivo, r.chaves) == (1, "sem_contexto", ["cp-art-155"])
+    assert "art. 155" in r.trecho
 
 
 def test_nivel_2_termo_e_contexto_fora_do_destaque(casador):
     doc = _doc(
-        "Seminário discute segurança pública. "
-        "Entre os casos, o Carandiru, onde presos foram mortos.",
-        manchete="Seminário discute segurança pública",
+        "Seminário discute o sistema de justiça. "
+        "Entre os casos, um recurso sobre furto qualificado.",
+        manchete="Seminário discute o sistema de justiça",
     )
     r = triar(doc, casador)
     assert (r.nivel, r.motivo, r.onde) == (2, "pede_juizo", "texto")
@@ -50,15 +55,16 @@ def test_nivel_2_termo_e_contexto_fora_do_destaque(casador):
 
 def test_nivel_3_termo_no_destaque(casador):
     doc = _doc(
-        "Em 1992 a Polícia Militar invadiu o Pavilhão 9 da Casa de Detenção. Houve indulto.",
-        manchete="Massacre do Carandiru: 34 anos",
+        "A Terceira Seção fixou tese em recurso repetitivo sobre o art. 155, § 4º, I, do "
+        "Código Penal. O caso envolvia também homicídio.",
+        ementa="FURTO QUALIFICADO. ROMPIMENTO DE OBSTÁCULO. PROVA.",
     )
     r = triar(doc, casador)
-    assert (r.nivel, r.motivo, r.onde) == (3, "aceito", "manchete")
-    assert r.chaves == ["casa-de-detencao", "indulto"]
-    assert r.categorias == ["lugar", "desdobramento-juridico"]
-    assert r.pontuacao == 1.5
-    assert r.trecho == "Massacre do Carandiru: 34 anos"
+    assert (r.nivel, r.motivo, r.onde) == (3, "aceito", "ementa")
+    assert r.chaves == ["cp-art-155", "cp-art-121"]
+    assert r.categorias == ["cp"]
+    assert r.pontuacao == 2.0
+    assert r.trecho == "FURTO QUALIFICADO. ROMPIMENTO DE OBSTÁCULO. PROVA."
 
 
 def test_recorte_marca_o_que_cortou():
@@ -68,5 +74,5 @@ def test_recorte_marca_o_que_cortou():
 
 
 def test_triagem_e_deterministica(casador):
-    doc = _doc("Carandiru, 1992: presos mortos.", manchete="Carandiru")
+    doc = _doc("Recurso: art. 155 do CP, pena de reclusão.", ementa="Furto qualificado")
     assert triar(doc, casador) == triar(doc, casador)

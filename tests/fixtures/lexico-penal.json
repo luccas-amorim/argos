@@ -1,0 +1,30 @@
+{
+  "id": "penal-amostra",
+  "versao": "2026-10-04",
+  "descricao": "Amostra para testes, no formato que exemplos/atlaspen/lexico.py gera.",
+  "termos": [
+    {
+      "chave": "cp-art-155",
+      "formas": ["art. 155 … Código Penal", "art. 155 … CP", "CP, art. 155"],
+      "exclusoes": ["art. 155 … Código Penal Militar"],
+      "categorias": ["cp"]
+    },
+    {
+      "chave": "cp-art-121",
+      "formas": ["art. 121 … Código Penal", "art. 121 … CP", "homicídio"],
+      "exclusoes": ["homicídio culposo na direção"],
+      "categorias": ["cp"],
+      "nota": "A exclusão aponta para o art. 302 do CTB, que é outro registro."
+    },
+    {
+      "chave": "nome-furto-qualificado",
+      "formas": ["furto qualificado"],
+      "peso": 0.5,
+      "categorias": ["nome"]
+    }
+  ],
+  "contexto": {
+    "exige_qualquer": ["acórdão", "recurso", "tese", "repetitivo", "condenação", "pena", "habeas corpus"],
+    "nota": "Vocabulário decisório: separa decisão de texto que só menciona o artigo."
+  }
+}

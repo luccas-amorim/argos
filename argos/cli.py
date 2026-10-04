@@ -3,7 +3,6 @@
     python -m argos rodar --config exemplos/config.exemplo.json
     python -m argos rodar --config ... --desde 2026-09-01 --sem-estado
     python -m argos retriar --config ...
-    python -m argos estimar --config ...
     python -m argos validar-lexico exemplos/lexico.exemplo.json
 
 Saídas: 0 nada a ler; 2 erro de execução ou fonte fora do ar; 3 há itens que pedem juízo.
@@ -16,8 +15,7 @@ import logging
 import sys
 from datetime import date
 
-from argos import __version__, config, estimativa, fontes, lexico, rodada, saidas
-from argos.saidas import catalogo
+from argos import __version__, config, fontes, lexico, rodada, saidas
 
 
 def _rodar(args: argparse.Namespace) -> int:
@@ -32,16 +30,7 @@ def _rodar(args: argparse.Namespace) -> int:
     resultado = rodada.rodar(cfg, instancias, casador, desde=desde, usar_estado=not args.sem_estado)
     pasta = saidas.escrever(resultado, cfg.saidas)
     print(f"{len(resultado.linhas)} itens; saídas em {pasta}")
-    _catalogar(cfg, resultado)
     return resultado.codigo_saida
-
-
-def _catalogar(cfg: config.Config, resultado: rodada.Rodada) -> None:
-    if cfg.catalogo_csv is None:
-        return
-    nivel = int(cfg.catalogo.get("nivel_minimo", 2))
-    novas = catalogo.atualizar(resultado, cfg.catalogo_csv, nivel)
-    print(f"catálogo: {novas} URLs novas em {cfg.catalogo_csv}")
 
 
 def _retriar(args: argparse.Namespace) -> int:
@@ -50,26 +39,7 @@ def _retriar(args: argparse.Namespace) -> int:
     resultado = rodada.retriar(cfg, casador, args.fonte)
     pasta = saidas.escrever(resultado, cfg.saidas)
     print(f"{len(resultado.linhas)} itens retriados; saídas em {pasta}")
-    _catalogar(cfg, resultado)
     return resultado.codigo_saida
-
-
-def _estimar(args: argparse.Namespace) -> int:
-    cfg = config.carregar(args.config)
-    estratos = {f["id"]: f.get("estrato", "geral") for f in cfg.fontes}
-    desde = date.fromisoformat(args.desde) if args.desde else None
-    por_estrato = estimativa.calcular(
-        cfg.saidas, args.nivel_minimo, lambda fonte: estratos.get(fonte, "geral"), desde
-    )
-    texto = estimativa.relatorio(por_estrato, desde)
-    destino = cfg.diretorio / "estimativa.md"
-    destino.parent.mkdir(parents=True, exist_ok=True)
-    destino.write_text(texto, encoding="utf-8")
-    for nome, est in sorted(por_estrato.items()):
-        piso = f"{est.chao:,.0f}" if est.chao is not None else "sem estimativa (um canal só)"
-        print(f"{nome}: {len(est.observadas)} URLs observadas; piso estimado: {piso}")
-    print(f"relatório em {destino}")
-    return rodada.SEM_NADA
 
 
 def _validar_lexico(args: argparse.Namespace) -> int:
@@ -100,12 +70,6 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--config", required=True)
     p.add_argument("--fonte")
     p.set_defaults(func=_retriar)
-
-    p = sub.add_parser("estimar", help="quanto falta: captura e recaptura entre os canais")
-    p.add_argument("--config", required=True)
-    p.add_argument("--nivel-minimo", type=int, default=2)
-    p.add_argument("--desde", help="AAAA-MM-DD: só itens a partir desta data")
-    p.set_defaults(func=_estimar)
 
     p = sub.add_parser("validar-lexico", help="confere o formato de um léxico")
     p.add_argument("arquivo")

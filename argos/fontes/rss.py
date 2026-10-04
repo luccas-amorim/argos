@@ -130,7 +130,7 @@ class Rss:
 def documento_html(ref: Referencia, resposta: Resposta, manchete: str | None = None) -> Documento:
     """Uma página HTML como Documento: texto visível, manchete e linha fina em destaque.
 
-    Compartilhado por todo adaptador que baixa página de veículo (rss, wayback, gdelt).
+    Compartilhado por todo adaptador que baixa página HTML (notícias de tribunal, por exemplo).
     """
     html, _ = decodificar(resposta.corpo, resposta.cabecalhos.get("content-type"))
     pagina = Pagina(html)

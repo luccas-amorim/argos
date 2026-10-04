@@ -2,9 +2,9 @@ from argos.texto import Pagina, decodificar, dobrar, normalizar
 
 
 def test_cp1252_declarado_como_latin1(fixtures):
-    texto, codificacao = decodificar((fixtures / "rss" / "materia-carandiru.html").read_bytes())
+    texto, codificacao = decodificar((fixtures / "rss" / "noticia-tese.html").read_bytes())
     assert codificacao == "cp1252"
-    assert "Detenção de\nSão Paulo" in texto
+    assert "Terceira Seção" in texto and "violência contra a\ncoisa" in texto
 
 
 def test_cabecalho_http_vence_o_meta():
@@ -28,14 +28,14 @@ def test_sem_declaracao_tenta_utf8_e_cai_em_cp1252():
 
 
 def test_pagina_ignora_script_nav_e_rodape(fixtures):
-    html, _ = decodificar((fixtures / "rss" / "materia-carandiru.html").read_bytes())
+    html, _ = decodificar((fixtures / "rss" / "noticia-tese.html").read_bytes())
     pagina = Pagina(html)
-    assert "Pavilhão 9" in pagina.texto
+    assert "rompimento de obstáculo" in pagina.texto
     assert "publicidade" not in pagina.texto
-    assert "Especial Carandiru" not in pagina.texto
-    assert "o filme" not in pagina.texto
-    assert pagina.manchete.startswith("Massacre do Carandiru")
-    assert pagina.meta["description"].startswith("Familiares")
+    assert "Especial Repetitivos" not in pagina.texto
+    assert "Código Penal Militar comentado" not in pagina.texto
+    assert pagina.manchete.startswith("Terceira Seção fixa tese")
+    assert pagina.meta["description"].startswith("Tema 9.999")
 
 
 def test_dobrar_preserva_comprimento():
