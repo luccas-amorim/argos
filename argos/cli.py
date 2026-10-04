@@ -3,6 +3,7 @@
     python -m argos rodar --config exemplos/config.exemplo.json
     python -m argos rodar --config ... --desde 2026-09-01 --sem-estado
     python -m argos retriar --config ...
+    python -m argos estimar --config ...
     python -m argos validar-lexico exemplos/lexico.exemplo.json
 
 Saídas: 0 nada a ler; 2 erro de execução ou fonte fora do ar; 3 há itens que pedem juízo.
@@ -15,7 +16,7 @@ import logging
 import sys
 from datetime import date
 
-from argos import __version__, config, fontes, lexico, rodada, saidas
+from argos import __version__, config, estimativa, fontes, lexico, rodada, saidas
 from argos.saidas import catalogo
 
 
@@ -53,6 +54,18 @@ def _retriar(args: argparse.Namespace) -> int:
     return resultado.codigo_saida
 
 
+def _estimar(args: argparse.Namespace) -> int:
+    cfg = config.carregar(args.config)
+    est = estimativa.calcular(cfg.saidas, args.nivel_minimo)
+    texto = estimativa.relatorio(est)
+    destino = cfg.diretorio / "estimativa.md"
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    destino.write_text(texto, encoding="utf-8")
+    piso = f"{est.chao:,.0f}" if est.chao is not None else "sem estimativa (um canal só)"
+    print(f"{len(est.observadas)} URLs observadas; piso estimado: {piso}; relatório em {destino}")
+    return rodada.SEM_NADA
+
+
 def _validar_lexico(args: argparse.Namespace) -> int:
     try:
         lex = lexico.carregar(args.arquivo)
@@ -81,6 +94,11 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--config", required=True)
     p.add_argument("--fonte")
     p.set_defaults(func=_retriar)
+
+    p = sub.add_parser("estimar", help="quanto falta: captura e recaptura entre os canais")
+    p.add_argument("--config", required=True)
+    p.add_argument("--nivel-minimo", type=int, default=2)
+    p.set_defaults(func=_estimar)
 
     p = sub.add_parser("validar-lexico", help="confere o formato de um léxico")
     p.add_argument("arquivo")

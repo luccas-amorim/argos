@@ -17,7 +17,7 @@ from email.utils import parsedate_to_datetime
 
 from argos.captura import montar_documento
 from argos.contrato import Documento, Referencia
-from argos.http import Cliente, Transporte, transporte_urllib
+from argos.http import Cliente, Resposta, Transporte, transporte_urllib
 from argos.texto import Pagina, decodificar
 
 _ATOM = "{http://www.w3.org/2005/Atom}"
@@ -121,34 +121,44 @@ class Rss:
                 yield ref
 
     def baixar(self, ref: Referencia) -> Documento:
-        resposta = self.cliente.requisitar(ref.url)
-        html, _ = decodificar(resposta.corpo, resposta.cabecalhos.get("content-type"))
-        pagina = Pagina(html)
-        manchete = ref.titulo or pagina.manchete or ""
-        texto = pagina.texto
-        if manchete and manchete not in texto:
-            texto = f"{texto}\n\n{manchete}"
-        destaques = {"manchete": manchete}
-        if descricao := pagina.meta.get("og:description") or pagina.meta.get("description"):
-            destaques["linha_fina"] = descricao
-            if descricao not in texto:
-                texto = f"{texto}\n\n{descricao}"
-        return montar_documento(
-            ref,
-            texto,
-            bruto=resposta.corpo,
-            cabecalhos={
-                k: v
-                for k, v in resposta.cabecalhos.items()
-                if k in ("content-type", "last-modified")
-            },
-            destaques=destaques,
-        )
+        return documento_html(ref, self.cliente.requisitar(ref.url), ref.titulo)
 
     def sentinela(self, doc: Documento) -> bool:
-        if len(doc.texto) < self.minimo_caracteres:
-            return False
-        if len(doc.texto) >= LIMITE_PAGINA_DE_ERRO:
-            return True
-        cabeca = doc.texto[:300].lower()
-        return not any(marca in cabeca for marca in MARCAS_DE_ERRO)
+        return pagina_integra(doc, self.minimo_caracteres)
+
+
+def documento_html(ref: Referencia, resposta: Resposta, manchete: str | None = None) -> Documento:
+    """Uma página HTML como Documento: texto visível, manchete e linha fina em destaque.
+
+    Compartilhado por todo adaptador que baixa página de veículo (rss, wayback, gdelt).
+    """
+    html, _ = decodificar(resposta.corpo, resposta.cabecalhos.get("content-type"))
+    pagina = Pagina(html)
+    manchete = manchete or pagina.manchete or ""
+    texto = pagina.texto
+    if manchete and manchete not in texto:
+        texto = f"{texto}\n\n{manchete}"
+    destaques = {"manchete": manchete}
+    if descricao := pagina.meta.get("og:description") or pagina.meta.get("description"):
+        destaques["linha_fina"] = descricao
+        if descricao not in texto:
+            texto = f"{texto}\n\n{descricao}"
+    return montar_documento(
+        ref,
+        texto,
+        bruto=resposta.corpo,
+        cabecalhos={
+            k: v for k, v in resposta.cabecalhos.items() if k in ("content-type", "last-modified")
+        },
+        destaques=destaques,
+    )
+
+
+def pagina_integra(doc: Documento, minimo_caracteres: int, marcas=MARCAS_DE_ERRO) -> bool:
+    """Texto longo o bastante e, se curto, sem cara de página de erro."""
+    if len(doc.texto) < minimo_caracteres:
+        return False
+    if len(doc.texto) >= LIMITE_PAGINA_DE_ERRO:
+        return True
+    cabeca = doc.texto[:300].lower()
+    return not any(marca in cabeca for marca in marcas)
