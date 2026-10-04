@@ -16,6 +16,7 @@ import sys
 from datetime import date
 
 from argos import __version__, config, fontes, lexico, rodada, saidas
+from argos.saidas import catalogo
 
 
 def _rodar(args: argparse.Namespace) -> int:
@@ -30,7 +31,16 @@ def _rodar(args: argparse.Namespace) -> int:
     resultado = rodada.rodar(cfg, instancias, casador, desde=desde, usar_estado=not args.sem_estado)
     pasta = saidas.escrever(resultado, cfg.saidas)
     print(f"{len(resultado.linhas)} itens; saídas em {pasta}")
+    _catalogar(cfg, resultado)
     return resultado.codigo_saida
+
+
+def _catalogar(cfg: config.Config, resultado: rodada.Rodada) -> None:
+    if cfg.catalogo_csv is None:
+        return
+    nivel = int(cfg.catalogo.get("nivel_minimo", 2))
+    novas = catalogo.atualizar(resultado, cfg.catalogo_csv, nivel)
+    print(f"catálogo: {novas} URLs novas em {cfg.catalogo_csv}")
 
 
 def _retriar(args: argparse.Namespace) -> int:
@@ -39,6 +49,7 @@ def _retriar(args: argparse.Namespace) -> int:
     resultado = rodada.retriar(cfg, casador, args.fonte)
     pasta = saidas.escrever(resultado, cfg.saidas)
     print(f"{len(resultado.linhas)} itens retriados; saídas em {pasta}")
+    _catalogar(cfg, resultado)
     return resultado.codigo_saida
 
 

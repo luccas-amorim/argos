@@ -1,0 +1,84 @@
+{
+ "status": "success",
+ "count": 3,
+ "items": [
+  {
+   "id": 9001,
+   "hash": "h9001",
+   "data_disponibilizacao": "2026-10-01",
+   "siglaTribunal": "STJ",
+   "tipoComunicacao": "Intimação",
+   "tipoDocumento": "Acórdão",
+   "nomeClasse": "RECURSO ESPECIAL",
+   "numeroprocessocommascara": "0001234-56.2025.3.00.0000",
+   "texto": "<p>RECURSO ESPECIAL Nº 2.100.000 - SP (2025/0000000-0)</p>\n<p>RELATOR: MINISTRO RELATOR DE EXEMPLO</p>\n<p>EMENTA</p>\n<p>PENAL E PROCESSUAL PENAL. RECURSO ESPECIAL. HOMICÍDIO QUALIFICADO. ART. 121, § 2º, IV, DO CÓDIGO PENAL. TRIBUNAL DO JÚRI. DECISÃO MANIFESTAMENTE CONTRÁRIA À PROVA DOS AUTOS. NÃO OCORRÊNCIA. DOSIMETRIA. PENA-BASE. CULPABILIDADE. FUNDAMENTAÇÃO CONCRETA.</p>\n<p>1. A anulação do veredicto do Conselho de Sentença só se admite quando a decisão dos jurados não encontra amparo em nenhuma versão constante dos autos.</p>\n<p>2. Recurso especial desprovido.</p>\n<p>ACÓRDÃO</p>\n<p>Vistos, relatados e discutidos estes autos, acordam os Ministros da Sexta Turma, por unanimidade, negar provimento ao recurso especial, nos termos do voto do Relator.</p>\n",
+   "link": "https://processo.stj.jus.br/processo/pesquisa/?num_registro=202500000000",
+   "destinatarios": [
+    {
+     "nome": "FULANO DE TAL",
+     "polo": "P"
+    }
+   ],
+   "destinatarioadvogados": [
+    {
+     "advogado": {
+      "nome": "BELTRANO ADVOGADO",
+      "numero_oab": "1"
+     }
+    }
+   ]
+  },
+  {
+   "id": 9002,
+   "hash": "h9002",
+   "data_disponibilizacao": "2026-10-01",
+   "siglaTribunal": "STJ",
+   "tipoComunicacao": "Intimação",
+   "tipoDocumento": "Despacho",
+   "nomeClasse": "RECURSO ESPECIAL",
+   "numeroprocessocommascara": "0001234-56.2025.3.00.0000",
+   "texto": "<p>Vista ao Ministério Público Federal. Publique-se.</p>",
+   "link": "https://processo.stj.jus.br/processo/pesquisa/?num_registro=202500000000",
+   "destinatarios": [
+    {
+     "nome": "FULANO DE TAL",
+     "polo": "P"
+    }
+   ],
+   "destinatarioadvogados": [
+    {
+     "advogado": {
+      "nome": "BELTRANO ADVOGADO",
+      "numero_oab": "1"
+     }
+    }
+   ]
+  },
+  {
+   "id": 9003,
+   "hash": "h9003",
+   "data_disponibilizacao": "2026-10-01",
+   "siglaTribunal": "STJ",
+   "tipoComunicacao": "Intimação",
+   "tipoDocumento": "Decisão",
+   "nomeClasse": "RECURSO ESPECIAL",
+   "numeroprocessocommascara": "0001234-56.2025.3.00.0000",
+   "texto": "DECISÃO\nTrata-se de habeas corpus impetrado em favor do paciente, condenado pela prática do crime previsto no art. 33 da Lei 11.343/2006. Alega-se constrangimento ilegal na fixação do regime. É o relatório. Decido. A pretensão não comporta acolhimento, pois o regime foi fixado com base em circunstâncias concretas. Ante o exposto, denego a ordem. Publique-se. Intimem-se.",
+   "link": "https://processo.stj.jus.br/processo/pesquisa/?num_registro=202500000000",
+   "destinatarios": [
+    {
+     "nome": "FULANO DE TAL",
+     "polo": "P"
+    }
+   ],
+   "destinatarioadvogados": [
+    {
+     "advogado": {
+      "nome": "BELTRANO ADVOGADO",
+      "numero_oab": "1"
+     }
+    }
+   ]
+  }
+ ]
+}

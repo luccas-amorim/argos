@@ -114,8 +114,13 @@ guardado, sem rede. Nada precisa ser baixado de novo.
 
 ## Decisões que são da pesquisa, não do código
 
-- **Onde mora o corpus.** O texto de dezenas de milhares de páginas cabe em poucos GB, mas
-  não deve morar em git. Opções: Git LFS, um bucket, ou releases compactadas por mês.
+- **Onde mora o corpus.** *Decidido em 04/10/2026:* o observatório guarda um **catálogo
+  CSV** com três colunas, `id`, `url` e `identificadores` (as chaves do léxico que
+  decidiram pelo item na primeira vez), e não guarda o texto (`"guardar_texto": false`).
+  O CSV cabe em git e cresce sem reescrever linha. O preço é conhecido: sem texto,
+  `retriar` não funciona, e um léxico novo exige baixar de novo; e página que sair do ar
+  só se recupera pelo Wayback. Configuração:
+  `"guardar_texto": false, "catalogo": {"arquivo": "catalogo.csv", "nivel_minimo": 2}`.
 - **O que se publica.** O Argos guarda o texto porque fontes somem. Republicar o texto
   integral de terceiros é outra questão (direito autoral); publicar o catálogo com URL,
   data, captura do Wayback e trecho é o caminho seguro.

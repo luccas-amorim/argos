@@ -54,6 +54,22 @@ class BloqueadoPorRobots(ErroColeta):
     """O robots.txt da origem não autoriza o caminho. Não é falha: é política."""
 
 
+class BloqueadoPorPais(ErroColeta):
+    """A origem recusa conexões de fora do Brasil (medido no DJEN, via CloudFront).
+
+    Não adianta tentar de novo nem trocar de cabeçalho: a rodada precisa sair de um IP
+    brasileiro (runner próprio no Brasil, máquina local, nuvem em região de São Paulo).
+    """
+
+
+# Assinaturas de bloqueio geográfico no corpo de um 403.
+_MARCAS_DE_PAIS = (
+    b"block access from your country",
+    b"not available in your country",
+    b"geo-restricted",
+)
+
+
 def transporte_urllib(req: Requisicao, tempo_limite: float) -> Resposta:
     pedido = urllib.request.Request(
         req.url, data=req.corpo, headers=req.cabecalhos, method=req.metodo
@@ -168,6 +184,11 @@ class Cliente:
             corpo = json.dumps(json_corpo, ensure_ascii=False).encode("utf-8")
             todos.setdefault("Content-Type", "application/json")
         resposta = self._enviar(Requisicao(metodo, url, corpo, todos))
+        if resposta.status == 403 and any(m in resposta.corpo for m in _MARCAS_DE_PAIS):
+            raise BloqueadoPorPais(
+                f"{metodo} {url}: a origem bloqueia acesso de fora do Brasil; "
+                "rode a partir de um IP brasileiro"
+            )
         if not 200 <= resposta.status < 300:
             trecho = resposta.corpo[:300].decode("utf-8", errors="replace")
             raise ErroColeta(f"{metodo} {url} -> HTTP {resposta.status}: {trecho}")

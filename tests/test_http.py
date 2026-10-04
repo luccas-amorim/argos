@@ -1,6 +1,6 @@
 import pytest
 
-from argos.http import USER_AGENT, BloqueadoPorRobots, Cliente, ErroColeta
+from argos.http import USER_AGENT, BloqueadoPorPais, BloqueadoPorRobots, Cliente, ErroColeta
 
 
 class Relogio:
@@ -84,3 +84,14 @@ def test_corpo_json_e_parametros(rede):
     assert pedido.url == "https://api.br/busca?q=a%C3%A7%C3%A3o"
     assert pedido.corpo == b'{"a": 1}'
     assert pedido.cabecalhos["Content-Type"] == "application/json"
+
+
+def test_bloqueio_por_pais_tem_erro_proprio(rede):
+    # Corpo real (resumido) do CloudFront do DJEN, medido em 04/10/2026 de fora do Brasil.
+    corpo = (
+        "<TITLE>ERROR: The request could not be satisfied</TITLE> The Amazon CloudFront "
+        "distribution is configured to block access from your country."
+    )
+    rede.responder("https://api.br/x", corpo, status=403)
+    with pytest.raises(BloqueadoPorPais, match="IP brasileiro"):
+        _cliente(rede, respeita_robots=False).requisitar("https://api.br/x")

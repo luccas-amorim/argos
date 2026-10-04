@@ -209,14 +209,16 @@ corpus possa entrar no grafo sem retrabalho.
 ## Roadmap
 
 Os dois usos têm plano próprio, com fontes, recorte e ordem de trabalho:
-[jurisprudência para o AtlasPen](docs/jurisprudencia.md) e
-[observatório do Carandiru](docs/carandiru.md).
+[jurisprudência para o AtlasPen](docs/jurisprudencia.md) (com o [plano do STF](docs/stf.md)
+à parte) e [observatório do Carandiru](docs/carandiru.md).
 
 - **v0.1** (feita; primeira rodada real contra o DataJud do STM em 04/10/2026) motor: contrato, captura com `.part` e sentinela, léxico com schema e
   validação, triagem em níveis, estado, saída JSONL, relatório em dois tamanhos.
   Um adaptador de cada família para provar o contrato: `rss` (genérico) e `datajud`.
-- **v0.2** jurisprudência: `stf`, `stj` com fixtures; exemplo de consumidor em
+- **v0.2** jurisprudência: `djen` (**feito**, falta rodada real com IP brasileiro),
+  `lista` e as fontes do STF, `stj` com fixtures; exemplo de consumidor em
   `exemplos/atlaspen/`. Primeira rodada real contra o léxico gerado de `crimes.json`.
+  Catálogo CSV cumulativo e modo sem texto (**feitos**), pedidos pelo observatório.
 - **v0.3** observatório: `wayback`, `google-noticias`, `scielo`; saída arquivística;
   exemplo de consumidor em `exemplos/observatorio/` com léxico de amostra.
 - **depois** saída issue no GitHub, nível opt-in com modelo (marcado), migração do `dou`.
@@ -237,6 +239,18 @@ python -m pytest                                                      # sem rede
 Cada rodada escreve em `<diretorio>/saidas/<id>/`: `aceitos.jsonl` (nível 3, com
 proveniência), `pede-juizo.jsonl` (nível 2), `itens.jsonl` (todos, com o motivo),
 `relatorio-resumo.md`, `relatorio-completo.md` e `rodada.json`.
+
+Com `"catalogo": {"arquivo": "catalogo.csv", "nivel_minimo": 2}` na configuração, cada
+rodada também acrescenta a um **catálogo CSV cumulativo** as URLs novas, com três
+colunas: `id`, `url` e `identificadores` (as chaves do léxico que decidiram pelo item na
+primeira vez). Com `"guardar_texto": false`, o texto integral é lido, triado e
+descartado: sobra só o catálogo, e `retriar` deixa de ter o que reler.
+
+**Onde rodar.** Parte das fontes brasileiras recusa conexão de fora do país: o DJEN
+(CloudFront com bloqueio por país) e o portal de dados abertos do STJ, medidos em
+04/10/2026. Runner hospedado do GitHub sai dos EUA. Para essas fontes, a rodada precisa
+de IP brasileiro: runner próprio registrado no GitHub Actions, máquina local ou VM em
+região de São Paulo. O Argos acusa o caso com `BloqueadoPorPais` no relatório.
 
 Códigos de saída: `0` nada a ler; `2` erro de execução ou fonte fora do ar; `3` há itens
 que pedem leitura (níveis 2 e 3).

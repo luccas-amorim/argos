@@ -5,10 +5,18 @@ do STM que impactem o entendimento e a aplicação de normas penais, materiais e
 processuais?
 
 Resposta curta: **sim, em ordem de dificuldade crescente: STJ, STM, STF.** O STJ publica
-dados abertos com ementa e inteiro teor; o STM está no DataJud e no DJEN; o STF bloqueia
-acesso automatizado à pesquisa de jurisprudência e exige um caminho mais estreito. O
-motor (v0.1) já está pronto; o que falta são os adaptadores de texto e o gerador de
-léxico, que mora no AtlasPen.
+no DJEN desde 28/11/2024 e mantém dados abertos com ementa e inteiro teor; o STM está no
+DataJud (a adesão ao DJEN está por conferir); o STF não está no DataJud nem no DJEN e
+bloqueia acesso automatizado à pesquisa de jurisprudência, o que exige um caminho
+próprio, descrito em [stf.md](stf.md). O motor e os adaptadores `datajud` e `djen` estão
+prontos; falta o gerador de léxico, que mora no AtlasPen.
+
+**Restrição de infraestrutura, medida em 04/10/2026:** o DJEN recusa conexões de fora do
+Brasil (CloudFront com bloqueio por país), e o portal de dados abertos do STJ também
+recusou. Runner hospedado do GitHub sai dos EUA. A rodada de jurisprudência precisa de
+**IP brasileiro**: runner próprio (uma máquina no Brasil registrada como self-hosted
+runner do GitHub Actions) ou uma VM pequena em região de São Paulo. O Argos acusa o caso
+com erro próprio (`BloqueadoPorPais`), em vez de um 403 genérico.
 
 ---
 
@@ -17,10 +25,10 @@ léxico, que mora no AtlasPen.
 | Fonte | Tribunais | Texto da decisão? | Estado no Argos |
 |---|---|---|---|
 | **DataJud** (CNJ), API pública | STJ, STM e todos os demais, **menos o STF** | não: classe, assuntos da TPU, órgão e movimentos | **adaptador pronto** (`datajud`) |
-| **DJEN** (Comunica PJe) | os que publicam no Diário de Justiça Eletrônico Nacional | sim, o texto do ato publicado | cliente pronto no Dikemetria (`dikemetria/coleta/djen.py`); portar como adaptador |
-| **Dados abertos do STJ** (CKAN) | STJ | sim: espelhos de acórdãos (ementa, órgão, referências) e íntegras de decisões terminativas e acórdãos | a escrever (`stj`) |
+| **DJEN** (Comunica PJe) | os que publicam no Diário de Justiça Eletrônico Nacional; o STJ desde 28/11/2024 | sim, o texto do ato publicado | **adaptador pronto** (`djen`), portado do Dikemetria; só responde a IP brasileiro |
+| **Dados abertos do STJ** (CKAN) | STJ | sim: espelhos de acórdãos (ementa, órgão, referências) e íntegras de decisões terminativas e acórdãos | a escrever (`stj`); recusou acesso de fora do Brasil |
 | **Pesquisa de jurisprudência do STF** | STF | sim | bloqueada por WAF a acesso automatizado (registrado no README do AtlasPen) |
-| **Páginas de precedentes do STF** | STF | tese, súmula, ementa | a sondar: teses de repercussão geral, súmulas vinculantes, informativos |
+| **Páginas de precedentes do STF** | STF | tese, súmula, ementa | plano em [stf.md](stf.md) |
 
 **Medido em 04/10/2026**, na primeira rodada real do Argos (índice do STM no DataJud):
 1.919 processos tiveram atualização entre 14/09 e 04/10; o mais recente era de 23/09, o
@@ -76,8 +84,10 @@ As normas **processuais** (CPP, LEP, Lei 9.099/95) não são tipos penais e não
 
 ## Ordem de trabalho proposta
 
-1. **Adaptador `djen`**, portado do Dikemetria, com filtro por `siglaTribunal` (STJ e
-   STM). Dá texto de decisão para dois dos três tribunais de uma vez.
+1. ~~**Adaptador `djen`**~~ **feito**: filtro por tribunal, por tipo de documento e pelo
+   texto da própria API; a ementa do acórdão vira o destaque do nível 3; destinatários
+   (partes e advogados) descartados na listagem. Falta a primeira rodada real, que
+   depende de IP brasileiro.
 2. **Adaptador `stj`** sobre os dados abertos: os espelhos têm a ementa, que é o
    destaque natural do nível 3 da triagem.
 3. **Gerador de léxico no AtlasPen**, com teste que o valide por
@@ -86,9 +96,8 @@ As normas **processuais** (CPP, LEP, Lei 9.099/95) não são tipos penais e não
    nível antes de ligar o agendamento.
 5. **`mapear.py` no AtlasPen**: o JSONL de aceitos vira `data/jurisprudencia.json`, e o
    que pede juízo vira pergunta na issue semanal, com a mesma regra dos outros robôs.
-6. **STF**: sondar com rede as páginas de teses de repercussão geral, de súmulas
-   vinculantes e os informativos. Se todas estiverem atrás do WAF, o caminho é o DataJud
-   por número de processo para as ADIs já conhecidas, e a lista curada por gente.
+6. **STF**: o plano tem documento próprio, [stf.md](stf.md). O STF não está no DataJud:
+   a versão anterior deste item sugeria buscar ADIs por lá, e estava errada.
 
 ## O que não fazer
 

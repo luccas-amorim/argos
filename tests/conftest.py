@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import json
+import shutil
 from pathlib import Path
 
 import pytest
 
 from argos.http import Requisicao, Resposta
+from tests.apoio import BASE, FEED
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -55,3 +58,27 @@ def rede() -> Rede:
 @pytest.fixture
 def fixtures() -> Path:
     return FIXTURES
+
+
+@pytest.fixture
+def cfg(tmp_path, fixtures):
+    """Configuração mínima: um feed RSS e o léxico de amostra do Carandiru."""
+    shutil.copy(fixtures / "lexico-carandiru.json", tmp_path / "lexico.json")
+    dados = {
+        "lexico": "lexico.json",
+        "diretorio": "dados",
+        "desde": "2026-09-01",
+        "fontes": [{"tipo": "rss", "id": "rss:jornal", "url": FEED, "minimo_caracteres": 200}],
+    }
+    caminho = tmp_path / "config.json"
+    caminho.write_text(json.dumps(dados), encoding="utf-8")
+    return caminho
+
+
+@pytest.fixture
+def rede_jornal(rede, fixtures):
+    rede.responder(FEED, fixtures / "rss" / "feed.xml")
+    rede.responder(f"{BASE}/carandiru-34-anos", fixtures / "rss" / "materia-carandiru.html")
+    rede.responder(f"{BASE}/drenagem", fixtures / "rss" / "materia-outra.html")
+    rede.responder(f"{BASE}/sumiu", fixtures / "rss" / "erro-200.html")
+    return rede

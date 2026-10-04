@@ -1,45 +1,10 @@
 """Rodada de ponta a ponta, sem rede: feed, páginas, sentinela, triagem, estado e saídas."""
 
 import json
-import shutil
 from datetime import date
 
-import pytest
-
 from argos import cli, config, estado, fontes, lexico, rodada, saidas
-
-FEED = "https://jornal.exemplo.br/feed"
-BASE = "https://jornal.exemplo.br/2026/10"
-
-
-@pytest.fixture
-def cfg(tmp_path, fixtures):
-    shutil.copy(fixtures / "lexico-carandiru.json", tmp_path / "lexico.json")
-    dados = {
-        "lexico": "lexico.json",
-        "diretorio": "dados",
-        "desde": "2026-09-01",
-        "fontes": [{"tipo": "rss", "id": "rss:jornal", "url": FEED, "minimo_caracteres": 200}],
-    }
-    caminho = tmp_path / "config.json"
-    caminho.write_text(json.dumps(dados), encoding="utf-8")
-    return caminho
-
-
-@pytest.fixture
-def rede_jornal(rede, fixtures):
-    rede.responder(FEED, fixtures / "rss" / "feed.xml")
-    rede.responder(f"{BASE}/carandiru-34-anos", fixtures / "rss" / "materia-carandiru.html")
-    rede.responder(f"{BASE}/drenagem", fixtures / "rss" / "materia-outra.html")
-    rede.responder(f"{BASE}/sumiu", fixtures / "rss" / "erro-200.html")
-    return rede
-
-
-def _rodar(caminho, rede, **kw):
-    c = config.carregar(caminho)
-    casador = lexico.Casador(lexico.carregar(c.lexico))
-    instancias = [fontes.construir(f, rede) for f in c.fontes]
-    return c, rodada.rodar(c, instancias, casador, hoje=date(2026, 10, 4), **kw)
+from tests.apoio import BASE, FEED, _rodar
 
 
 def test_rodada_completa(cfg, rede_jornal):

@@ -4,10 +4,11 @@ from __future__ import annotations
 
 from argos.contrato import Fonte
 from argos.fontes.datajud import DataJud
+from argos.fontes.djen import Djen
 from argos.fontes.rss import Rss
 from argos.http import Transporte, transporte_urllib
 
-TIPOS = {"rss": Rss, "datajud": DataJud}
+TIPOS = {"rss": Rss, "datajud": DataJud, "djen": Djen}
 
 
 def construir(cfg: dict, transporte: Transporte = transporte_urllib) -> Fonte:

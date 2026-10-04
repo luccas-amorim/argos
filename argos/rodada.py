@@ -96,7 +96,7 @@ def nova_rodada(casador: Casador, modo: str, agora: datetime | None = None) -> R
     )
 
 
-def linha_triada(doc: Documento, casador: Casador, caminho: str) -> Linha:
+def linha_triada(doc: Documento, casador: Casador, caminho: str | None) -> Linha:
     return Linha(
         ref=doc.ref,
         situacao=TRIADO,
@@ -173,7 +173,7 @@ def rodar(
 ) -> Rodada:
     hoje = hoje or date.today()
     rodada = nova_rodada(casador, "rodar", agora)
-    corpus = Corpus(config.corpus)
+    corpus = Corpus(config.corpus, guardar=config.guardar_texto)
     for fonte in fontes:
         memoria = estado.ler(config.estado, fonte.id) if usar_estado else estado.Estado(fonte.id)
         inicio = desde

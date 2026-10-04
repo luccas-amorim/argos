@@ -22,4 +22,5 @@ fixture sintética supunha. Só traz metadado processual público (classe, assun
 | `rss/erro-200.html` | página de erro servida com HTTP 200 |
 | `datajud/pagina1.json` | resposta de `_search` do DataJud, com assuntos aninhados e um processo em sigilo |
 | `datajud/stm-real-2026-10-04.json` | **real**: `_search` no índice do STM, dois processos |
+| `djen/stj-2026-10-01.json` | página da API do DJEN: um acórdão com ementa, um despacho, uma decisão monocrática; com destinatários fictícios, para provar que são descartados |
 | `lexico-carandiru.json` | léxico de amostra; o real é mantido pela pesquisa |
