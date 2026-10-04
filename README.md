@@ -72,14 +72,18 @@ Cinco peças, cada uma com um contrato pequeno e um diretório:
 | Diretório | Peça | O que garante |
 |---|---|---|
 | `argos/fontes/` | **Adaptadores** | um por origem; mesmo contrato para todos (abaixo) |
+| `argos/http.py` | **Cliente** | identifica o projeto, obedece o limite declarado e o `robots.txt`, tenta de novo em 429 e 5xx |
 | `argos/captura.py` | **Captura** | texto integral normalizado em UTF-8, hash, data; respeita limite da fonte; grava `.part` e só promove quando a sentinela de integridade passa |
 | `argos/lexico.py` | **Léxico** | carrega e valida o vocabulário contra `exemplos/lexico.schema.json`; expande variantes; nunca contém termo em código |
 | `argos/triagem.py` | **Triagem** | níveis, motivo de descarte, trecho que decidiu |
 | `argos/saidas/` | **Saídas** | JSONL (canônico), CSV, issue no GitHub, export arquivístico |
 
-O estado é um arquivo (`estado/<fonte>.json`) com os hashes já vistos e a data da última
-rodada por fonte. Apagar o estado equivale a reler tudo. Nada mais é guardado entre
-rodadas.
+O estado é um arquivo (`estado/<fonte>.json`) com os hashes já vistos, a data da última
+rodada por fonte e os **pendentes**: itens cuja captura falhou ou que a sentinela
+reprovou. Pendente é tentado de novo em toda rodada, mesmo depois de sair da janela de
+datas; sem isso, um item que falhou uma vez sumiria em silêncio. Apagar o estado equivale
+a reler tudo. Além do estado, só o corpus (o texto integral de cada item íntegro) é
+guardado entre rodadas.
 
 ### O contrato do adaptador
 
@@ -119,6 +123,7 @@ rede. Fonte que muda de forma quebra o teste, não a rodada em silêncio.
       "formas": ["homicídio", "art. 121 do Código Penal", "art. 121, CP", "121 do CP"],
       "exclusoes": ["homicídio culposo na direção"],
       "peso": 1.0,
+      "categorias": ["cp", "crime-contra-a-vida"],
       "nota": "A exclusão aponta para o art. 302 do CTB, que é outro registro."
     }
   ],
@@ -128,6 +133,10 @@ rede. Fonte que muda de forma quebra o teste, não a rodada em silêncio.
   }
 }
 ```
+
+O casamento ignora maiúsculas e acentos, exige palavra inteira e tolera quebra de linha
+onde a forma tem espaço. Ocorrência que cai dentro de uma `exclusao` não conta. As
+`categorias` (opcionais) são facetas de catalogação e vão para a saída junto com a chave.
 
 O léxico tem dono fora deste repositório. O do AtlasPen é gerado a partir de
 `crimes.json`; o do Carandiru é mantido pela pesquisa que o catalogou. O Argos valida
@@ -141,6 +150,10 @@ o formato e aplica. Mudar um termo é um commit em dado, não em código.
 | 1 | termo presente, sem contexto exigido | descartado, motivo `sem_contexto`, com o trecho |
 | 2 | termo e contexto presentes | **pede juízo**: entra no relatório, com trecho |
 | 3 | termo, contexto e marcador forte da fonte (ementa, dispositivo, manchete) | **aceito**: entra na saída com proveniência |
+
+O "marcador forte" é o campo `destaques` do `Documento`: cada adaptador declara quais
+trechos a própria fonte marca como fortes (a manchete e a linha fina no `rss`, os assuntos
+da TPU no `datajud`, a ementa no futuro `stj`).
 
 O corte não apaga: nível 0 e 1 saem no relatório completo, uma linha cada, com o motivo.
 É isso que torna o filtro auditável e permite retriar quando o léxico mudar, porque o
@@ -195,7 +208,11 @@ corpus possa entrar no grafo sem retrabalho.
 
 ## Roadmap
 
-- **v0.1** motor: contrato, captura com `.part` e sentinela, léxico com schema e
+Os dois usos têm plano próprio, com fontes, recorte e ordem de trabalho:
+[jurisprudência para o AtlasPen](docs/jurisprudencia.md) e
+[observatório do Carandiru](docs/carandiru.md).
+
+- **v0.1** (feita; primeira rodada real contra o DataJud do STM em 04/10/2026) motor: contrato, captura com `.part` e sentinela, léxico com schema e
   validação, triagem em níveis, estado, saída JSONL, relatório em dois tamanhos.
   Um adaptador de cada família para provar o contrato: `rss` (genérico) e `datajud`.
 - **v0.2** jurisprudência: `stf`, `stj` com fixtures; exemplo de consumidor em
@@ -206,14 +223,23 @@ corpus possa entrar no grafo sem retrabalho.
 
 ## Rodar
 
+Só biblioteca padrão; Python 3.11 ou mais novo.
+
 ```bash
-python -m argos rodar --config exemplos/atlaspen/config.json       # uma rodada
+pip install -e ".[dev]"
+python -m argos rodar --config exemplos/config.exemplo.json         # uma rodada
 python -m argos rodar --config ... --desde 2026-09-01 --sem-estado  # reler tudo
+python -m argos retriar --config ...                                # léxico novo, corpus guardado, sem rede
 python -m argos validar-lexico exemplos/lexico.exemplo.json
 python -m pytest                                                      # sem rede, contra fixtures
 ```
 
-Saídas: `0` nada a ler; `2` erro de execução ou fonte fora do ar; `3` há itens que pedem juízo.
+Cada rodada escreve em `<diretorio>/saidas/<id>/`: `aceitos.jsonl` (nível 3, com
+proveniência), `pede-juizo.jsonl` (nível 2), `itens.jsonl` (todos, com o motivo),
+`relatorio-resumo.md`, `relatorio-completo.md` e `rodada.json`.
+
+Códigos de saída: `0` nada a ler; `2` erro de execução ou fonte fora do ar; `3` há itens
+que pedem leitura (níveis 2 e 3).
 
 ## Licença
 

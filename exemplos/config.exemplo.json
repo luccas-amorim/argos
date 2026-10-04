@@ -1,0 +1,15 @@
+{
+  "lexico": "lexico.exemplo.json",
+  "diretorio": "../dados",
+  "desde": "2026-09-01",
+  "margem_dias": 2,
+  "fontes": [
+    {
+      "tipo": "datajud",
+      "id": "datajud:stm",
+      "tribunal": "stm",
+      "tamanho_pagina": 100,
+      "limite_por_minuto": 30
+    }
+  ]
+}
